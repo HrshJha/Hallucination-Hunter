@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 # Copy source
 COPY . .
 
-# Set PYTHONPATH so bare imports (from configs.X, from core.X, etc.) resolve
-ENV PYTHONPATH="/hallucination_hunter:/hallucination_hunter/app"
+# Set PYTHONPATH so app-prefixed imports resolve from project root
+ENV PYTHONPATH="/hallucination_hunter"
 
 # Expose port (Render overrides this via PORT env var)
 EXPOSE 10000

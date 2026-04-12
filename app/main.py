@@ -4,28 +4,13 @@ Hallucination Hunter – FastAPI Application
 
 from __future__ import annotations
 
-import sys
 import os
-
-# ── Path Setup ──────────────────────────────────────────────────────
-# PROJECT_ROOT = parent of `app/` = the repo root (hallucination_hunter/)
-# We add it to sys.path so bare imports like `from configs.settings ...`,
-# `from core.pipeline ...`, `from models.schemas ...` resolve correctly.
-# This is also reinforced via PYTHONPATH in the start command / Dockerfile.
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-# Also add app/ itself so sibling packages resolve from within app/
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-if APP_DIR not in sys.path:
-    sys.path.insert(0, APP_DIR)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from api.routes import router
+from app.api.routes import router
 
 app = FastAPI(
     title="Hallucination Hunter",
@@ -51,7 +36,7 @@ app.add_middleware(
 app.include_router(router)
 
 # Serve the Web UI at root
-INDEX_HTML = os.path.join(PROJECT_ROOT, "ui", "index.html")
+INDEX_HTML = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ui", "index.html")
 
 
 @app.get("/", include_in_schema=False)

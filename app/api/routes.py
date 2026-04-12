@@ -9,10 +9,10 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from models.schemas import DetectionRequest, DetectionResponse
-from core.pipeline import detect
-from claims.extractor import extract_claims, extract_source_sentences
-from utils.visualization import plot_alignment_matrix
+from app.models.schemas import DetectionRequest, DetectionResponse
+from app.core.pipeline import detect
+from app.claims.extractor import extract_claims, extract_source_sentences
+from app.utils.visualization import plot_alignment_matrix
 
 router = APIRouter()
 

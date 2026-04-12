@@ -6,8 +6,8 @@ echo "=========================================="
 echo "🚀 Starting Hallucination Hunter API server"
 echo "=========================================="
 
-# Set PYTHONPATH so bare imports resolve
-export PYTHONPATH="$(pwd):$(pwd)/app"
+# Set PYTHONPATH so app-prefixed imports resolve
+export PYTHONPATH="$(pwd)"
 
 # Check if the virtual environment exists
 if [ ! -d ".venv" ]; then

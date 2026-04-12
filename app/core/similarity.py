@@ -12,7 +12,7 @@ from typing import List, Tuple
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from configs.settings import settings
+from app.configs.settings import settings
 
 # ── Lazy singleton ───────────────────────────────────────────────────
 

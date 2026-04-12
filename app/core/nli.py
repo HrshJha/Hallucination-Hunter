@@ -13,7 +13,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from configs.settings import settings
+from app.configs.settings import settings
 
 # ── Label map ────────────────────────────────────────────────────────
 

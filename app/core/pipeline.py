@@ -13,12 +13,12 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from claims.extractor import extract_claims, extract_source_sentences
-from core.nli import classify_claims_against_source
-from core.similarity import cosine_matrix
-from core.aggregator import aggregate
-from models.schemas import ClaimResult, DetectionResponse, DetectionMetrics
-from configs.settings import settings
+from app.claims.extractor import extract_claims, extract_source_sentences
+from app.core.nli import classify_claims_against_source
+from app.core.similarity import cosine_matrix
+from app.core.aggregator import aggregate
+from app.models.schemas import ClaimResult, DetectionResponse, DetectionMetrics
+from app.configs.settings import settings
 
 
 def detect(source: str, response: str) -> DetectionResponse:

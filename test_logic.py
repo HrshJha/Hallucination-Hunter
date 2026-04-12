@@ -3,16 +3,9 @@ Smoke test: verify the refactored pipeline produces correct results
 for all 4 mandatory test scenarios.
 """
 
-import sys
-import os
 import json
 
-# Ensure project root is importable
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-from core.pipeline import detect
+from app.core.pipeline import detect
 
 
 def run(name, source, response, expected_verdict):

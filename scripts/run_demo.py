@@ -11,16 +11,11 @@ without starting the FastAPI server.
 import sys
 import os
 
-# If running from within hallucination_hunter/
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
 # ── 2. Run detection ────────────────────────────────────────────────
 
-from core.pipeline import detect
-from utils.visualization import plot_alignment_matrix
-from claims.extractor import extract_source_sentences
+from app.core.pipeline import detect
+from app.utils.visualization import plot_alignment_matrix
+from app.claims.extractor import extract_source_sentences
 
 # Example 1: Faithful response
 source_1 = (

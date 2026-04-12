@@ -1,84 +1,319 @@
-# 🔍 Hallucination Hunter
+<div align="center">
 
-**Production-ready factual consistency & hallucination detection for AI-generated responses.**
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:24243e&height=220&section=header&text=🔍%20Hallucination%20Hunter&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=AI%20doesn't%20always%20tell%20the%20truth.%20Now%20you%20can%20prove%20it.&descAlignY=58&descSize=16&descColor=ccccff" width="100%"/>
 
-Hallucination Hunter takes a source passage and an AI-generated answer, then returns a **FAITHFUL / HALLUCINATED** verdict with per-claim NLI breakdown and an alignment heatmap.
+<br/>
 
----
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![HuggingFace](https://img.shields.io/badge/🤗-Transformers-FFD21E?style=for-the-badge)](https://huggingface.co)
+[![License](https://img.shields.io/badge/License-MIT-a855f7?style=for-the-badge)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/hrshjha/hallucination-hunter?style=for-the-badge&logo=github&color=f59e0b&labelColor=1a1a2e)](https://github.com/hrshjha/hallucination-hunter)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-22c55e?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
 
-## 🏗 Architecture
+<br/>
+
+<table>
+<tr>
+<td align="center">🎯<br/><b>Claim-Level</b><br/>Verification</td>
+<td align="center">⚡<br/><b>REST API</b><br/>Ready</td>
+<td align="center">🧠<br/><b>NLI-Powered</b><br/>Reasoning</td>
+<td align="center">📊<br/><b>Explainable</b><br/>Output</td>
+<td align="center">🔌<br/><b>RAG Pipeline</b><br/>Compatible</td>
+</tr>
+</table>
+
+<br/>
+
+> *"Don't trust. Verify. Automatically."*
+
+<br/>
+
+**Made with ❤️ by [Harsh Kumar](https://github.com/hrshjha)**
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+</div>
+
+<br/>
+
+## 📌 The Problem
+
+Every day, millions of users receive AI-generated answers they **can't verify**. Language models are extraordinarily fluent — but fluency is not the same as accuracy.
+
+```
+User asks  →  LLM answers confidently  →  User trusts it  →  User is wrong
+```
+
+The failure modes are subtle and dangerous:
+
+| Type | Example |
+|---|---|
+| 🔴 **Direct Contradiction** | Source says "Paris", model says "Berlin" |
+| 🟡 **Unsupported Claim** | Source never mentions the year, model invents one |
+| 🟠 **Partial Hallucination** | 80% correct, one quietly fabricated detail |
+
+> Existing tools either flag the entire response or do nothing at all. Neither is useful.
+
+**Hallucination Hunter solves this at the claim level** — every sentence gets its own verdict.
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 💡 The Solution
+
+Instead of treating an AI response as a single block of text, Hallucination Hunter **decomposes it into individual claims** and verifies each one independently against your source.
+
+<div align="center">
+
+```
+"The Eiffel Tower is in Berlin and was built in 1920."
+                        ↓ decompose
+     ┌──────────────────────────────────────┐
+     │  Claim 1: Eiffel Tower is in Berlin  │  ← ❌ CONTRADICTION
+     │  Claim 2: It was built in 1920       │  ← ❌ UNSUPPORTED
+     └──────────────────────────────────────┘
+                        ↓ aggregate
+                   HALLUCINATED (0.78)
+```
+
+</div>
+
+This matters because **partial hallucinations are the hardest to catch** — a response can be 90% accurate and still dangerously wrong.
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🚀 Features
+
+- 🔬 &nbsp;**Claim-Level Granularity** — Each sentence in the AI response gets its own verdict, not a single blurry score for the whole response
+- 🧠 &nbsp;**Neural NLI Reasoning** — DeBERTa-v3 cross-encoder classifies every claim as `ENTAILED`, `CONTRADICTION`, or `NEUTRAL`
+- 📐 &nbsp;**Semantic Similarity Grounding** — Sentence-Transformers cosine similarity anchors claims to the source semantically
+- ⚖️ &nbsp;**Conservative Classification** — Neutral predictions are treated as `UNSUPPORTED` to minimize false positives
+- 📊 &nbsp;**Alignment Heatmap** — Visual matrix showing exactly how each claim maps to each source sentence
+- 📝 &nbsp;**Human-Readable Summary** — Plain-English explanation of *why* the verdict was reached
+- ⚡ &nbsp;**FastAPI REST Interface** — Production-ready endpoints, Swagger UI included
+- 🔌 &nbsp;**RAG Pipeline Ready** — Drop-in verification layer for any Retrieval-Augmented Generation system
+- 🧩 &nbsp;**Extensible Architecture** — Swap NLI models, add extractors, or plug in custom aggregation logic
+- 🐳 &nbsp;**Docker Ready** — One command to containerize and deploy anywhere
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🛠 Tech Stack
+
+<div align="center">
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org)
+[![HuggingFace](https://img.shields.io/badge/🤗_Transformers-FFD21E?style=flat-square)](https://huggingface.co)
+[![spaCy](https://img.shields.io/badge/spaCy-09A3D5?style=flat-square)](https://spacy.io)
+[![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org)
+[![XGBoost](https://img.shields.io/badge/XGBoost-189AB4?style=flat-square)](https://xgboost.readthedocs.io)
+[![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)](https://pandas.pydata.org)
+[![Seaborn](https://img.shields.io/badge/Seaborn-4B8BBE?style=flat-square)](https://seaborn.pydata.org)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+
+</div>
+
+<br/>
+
+| Component | Technology | Why |
+|---|---|---|
+| **API Layer** | FastAPI + Uvicorn | Async, fast, auto-documented |
+| **NLI Engine** | `cross-encoder/nli-deberta-v3-small` | Best-in-class entailment model |
+| **Embeddings** | `all-mpnet-base-v2` | High-quality semantic similarity |
+| **Claim Extractor** | spaCy `en_core_web_sm` | Lightweight, accurate sentence splits |
+| **Ensemble** | scikit-learn / XGBoost | Optional meta-classifier stacking |
+| **Visualization** | Matplotlib + Seaborn | Alignment heatmap as base64 PNG |
+| **Data** | HaluEval + TRUE benchmark | 35K+ annotated hallucination examples |
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 📂 Project Structure
 
 ```
 hallucination_hunter/
 │
-├── app/
-│   ├── main.py                  # FastAPI entry point
-│   ├── api/
-│   │   └── routes.py            # POST /detect, /detect/visualize, /health
-│   ├── inference/
-│   │   ├── similarity.py        # Baseline: sentence-transformers cosine similarity
-│   │   ├── nli.py               # Core: cross-encoder NLI (DeBERTa-v3-small)
-│   │   ├── aggregator.py        # Aggregation rules → final verdict
-│   │   ├── pipeline.py          # Full orchestration pipeline
-│   │   └── ensemble.py          # Optional ensemble (LR / XGBoost)
-│   ├── models/
-│   │   └── schemas.py           # Pydantic request / response models
-│   ├── claims/
-│   │   └── extractor.py         # spaCy claim extraction + filtering
-│   └── utils/
-│       ├── helpers.py           # Timer, truncation helpers
-│       └── visualization.py     # Alignment matrix heatmap (matplotlib/seaborn)
+├── 📁 app/                              # Core application
+│   ├── 🐍 main.py                       # FastAPI entry point & app factory
+│   │
+│   ├── 📁 api/
+│   │   └── 🐍 routes.py                 # /detect · /detect/visualize · /health
+│   │
+│   ├── 📁 inference/
+│   │   ├── 🐍 nli.py                    # DeBERTa-v3 NLI cross-encoder
+│   │   ├── 🐍 similarity.py             # Sentence-Transformers cosine scoring
+│   │   ├── 🐍 aggregator.py             # Rules engine → FAITHFUL / HALLUCINATED
+│   │   ├── 🐍 pipeline.py               # End-to-end orchestration
+│   │   └── 🐍 ensemble.py               # Optional LR / XGBoost stacking
+│   │
+│   ├── 📁 models/
+│   │   └── 🐍 schemas.py                # Pydantic request & response models
+│   │
+│   ├── 📁 claims/
+│   │   └── 🐍 extractor.py              # spaCy segmentation + claim filtering
+│   │
+│   └── 📁 utils/
+│       ├── 🐍 helpers.py                # Timers, truncation utilities
+│       └── 🐍 visualization.py          # Heatmap → base64 PNG
 │
-├── training/
-│   ├── data_pipeline.py         # HaluEval loader + preprocessing + splitting
-│   └── train_ensemble.py        # Train ensemble classifier
+├── 📁 training/
+│   ├── 🐍 data_pipeline.py              # HaluEval + TRUE loader & preprocessor
+│   └── 🐍 train_ensemble.py             # Ensemble training script
 │
-├── evaluation/
-│   └── evaluate.py              # Balanced accuracy, precision, recall, F1
+├── 📁 evaluation/
+│   └── 🐍 evaluate.py                   # Balanced accuracy, F1, ROC AUC
 │
-├── configs/
-│   └── settings.py              # All configuration in one place
+├── 📁 configs/
+│   └── 🐍 settings.py                   # Single source of truth for all config
 │
-├── requirements.txt
-├── Dockerfile
-└── README.md
+├── 📁 data/                             # Auto-generated after pipeline runs
+│   ├── train.parquet
+│   ├── val.parquet
+│   └── test.parquet
+│
+├── 📁 models/                           # Saved ensemble weights
+│   └── ensemble.pkl
+│
+├── 🐳 Dockerfile
+├── 📋 requirements.txt
+└── 📄 README.md
+```
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+| Requirement | Version | Link |
+|---|---|---|
+| Python | 3.9 or higher | [python.org](https://www.python.org/downloads/) |
+| Git | Any | [git-scm.com](https://git-scm.com/downloads) |
+| Docker *(optional)* | Any | [docker.com](https://docker.com) |
+
+Confirm your environment before starting:
+
+```bash
+python --version
+# Python 3.9.x or higher
+
+git --version
+# git version 2.x.x
 ```
 
 ---
 
-## 🚀 Quick Start
-
-### 1. Install Dependencies
+### Step 1 — Clone the Repository
 
 ```bash
-cd hallucination_hunter
+git clone https://github.com/hrshjha/hallucination-hunter.git
+cd hallucination-hunter
+```
+
+---
+
+### Step 2 — Install Python Dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+Then download the spaCy language model:
+
+```bash
 python -m spacy download en_core_web_sm
 ```
 
-### 2. Run the API
+---
+
+### Step 3 — Start the API
 
 ```bash
-# From hallucination_hunter/ directory
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 3. Open Interactive Docs
+When the server is ready, you'll see:
 
-Visit: [http://localhost:8000/docs](http://localhost:8000/docs)
+```
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Application startup complete.
+```
 
 ---
 
-## 📡 API Usage
+### Step 4 — Explore the Interactive Docs
 
-### POST `/detect`
+```
+http://localhost:8000/docs
+```
+
+Swagger UI is auto-generated — test every endpoint directly in the browser, no extra tools needed.
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 📸 Screenshots & Demo
+
+<div align="center">
+
+| Swagger UI | Heatmap Output | Claim Breakdown |
+|:---:|:---:|:---:|
+| ![Swagger UI](https://placehold.co/280x180/1a1a2e/ffffff?text=Swagger+UI) | ![Heatmap](https://placehold.co/280x180/302b63/ffffff?text=Alignment+Heatmap) | ![Claims](https://placehold.co/280x180/24243e/ffffff?text=Claim+Breakdown) |
+| *Interactive API docs at `/docs`* | *Claim-to-source alignment matrix* | *Per-claim NLI verdict* |
+
+> 💡 **Live Demo** — Run locally and hit `/docs` for a fully interactive experience.
+
+</div>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🧪 Usage
+
+### API Endpoints at a Glance
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/detect` | Returns verdict + per-claim analysis |
+| `POST` | `/detect/visualize` | Same as above + base64 alignment heatmap |
+| `GET` | `/health` | Server health check |
+
+---
+
+### Detect Hallucinations
 
 ```bash
 curl -X POST http://localhost:8000/detect \
   -H "Content-Type: application/json" \
   -d '{
-    "source": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It was constructed from 1887 to 1889 as the centerpiece of the 1889 World Fair.",
-    "response": "The Eiffel Tower is located in Berlin, Germany. It was built in 1920 for the Olympic Games."
+    "source": "The Eiffel Tower is in Paris and was built between 1887 and 1889.",
+    "response": "The Eiffel Tower is in Berlin and was built in 1920."
   }'
 ```
 
@@ -86,232 +321,339 @@ curl -X POST http://localhost:8000/detect \
 
 ```json
 {
-  "label": "HALLUCINATED",
-  "confidence": 0.92,
+  "verdict": "HALLUCINATED",
+  "confidence": 0.78,
+  "summary": "2 unsupported and 1 contradictory claims detected → response is hallucinated",
   "claims": [
     {
-      "text": "The Eiffel Tower is located in Berlin, Germany.",
-      "label": "contradiction",
-      "score": 0.97
+      "text": "The Eiffel Tower is located in Berlin.",
+      "final_label": "CONTRADICTION",
+      "similarity": 0.42
     },
     {
-      "text": "It was built in 1920 for the Olympic Games.",
-      "label": "contradiction",
-      "score": 0.94
+      "text": "It was built in 1920.",
+      "final_label": "UNSUPPORTED",
+      "similarity": 0.35
     }
-  ],
-  "alignment_matrix": [[0.45, 0.12], [0.08, 0.31]]
+  ]
 }
 ```
 
-### POST `/detect/visualize`
+---
 
-Same as `/detect` but also returns `heatmap_png_base64` — a base64-encoded PNG alignment heatmap.
+### Get Verdict with Heatmap
 
-### GET `/health`
+```bash
+curl -X POST http://localhost:8000/detect/visualize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": "Python was created by Guido van Rossum in 1991.",
+    "response": "Python was invented by Linus Torvalds in 2005."
+  }'
+```
+
+**Additional field in response:**
+
+```json
+{
+  "verdict": "HALLUCINATED",
+  "confidence": 0.95,
+  "heatmap_png_base64": "iVBORw0KGgoAAAANSUhEUgAA..."
+}
+```
+
+Decode the base64 string to get a PNG image of the semantic alignment matrix.
+
+---
+
+### Health Check
 
 ```bash
 curl http://localhost:8000/health
-# {"status": "ok"}
+# { "status": "ok" }
 ```
 
 ---
 
-## 🧠 Models
+### Claim Label Reference
 
-| Model | Purpose | HuggingFace ID |
-|-------|---------|----------------|
-| Similarity Baseline | Cosine similarity between embeddings | `sentence-transformers/all-mpnet-base-v2` |
-| NLI Engine (Core) | Per-claim entailment/contradiction/neutral | `cross-encoder/nli-deberta-v3-small` |
-| Ensemble (Optional) | Combines similarity + NLI features | Logistic Regression / XGBoost |
+| Label | Meaning | Effect on Verdict |
+|---|---|---|
+| ✅ `ENTAILED` | Claim is directly supported by the source | Counts toward FAITHFUL |
+| ❌ `CONTRADICTION` | Claim directly conflicts with the source | Triggers HALLUCINATED |
+| 🟡 `UNSUPPORTED` | Claim is not grounded in source (neutral → unsupported) | Triggers HALLUCINATED |
 
----
+<br/>
 
-## 📊 Pipeline Flow
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🔬 Pipeline — Deep Dive
 
 ```
-AI Response
-    │
-    ▼
-┌─────────────────────┐
-│  Claim Extraction   │  (spaCy sentence segmentation + filtering)
-│  (extractor.py)     │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│  NLI Classification │     │  Similarity Matrix   │
-│  (nli.py)           │     │  (similarity.py)     │
-└─────────┬───────────┘     └─────────┬───────────┘
-          │                           │
-          ▼                           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│  Aggregation Rules  │     │  Alignment Heatmap   │
-│  (aggregator.py)    │     │  (visualization.py)  │
-└─────────┬───────────┘     └─────────────────────┘
-          │
-          ▼
-   FAITHFUL / HALLUCINATED
+┌──────────────────────────────────────────────────────────────┐
+│                      AI Response Text                         │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+              ┌────────────────────────────┐
+              │      Claim Extraction       │
+              │  spaCy sentence splitter    │
+              │  + short-claim filter       │
+              │  + deduplication            │
+              └───────────────┬────────────┘
+                              │
+               ┌──────────────┴──────────────┐
+               │                             │
+               ▼                             ▼
+  ┌────────────────────────┐   ┌──────────────────────────┐
+  │    NLI Classification   │   │   Semantic Similarity     │
+  │  DeBERTa-v3 cross-enc  │   │   all-mpnet-base-v2       │
+  │  → ENTAILED             │   │   cosine similarity       │
+  │  → CONTRADICTION        │   │   claim × source matrix   │
+  │  → NEUTRAL              │   │   → alignment heatmap     │
+  └────────────┬───────────┘   └──────────────────────────┘
+               │
+               ▼
+  ┌────────────────────────┐
+  │    Aggregation Engine   │
+  │  entailment fraction   │
+  │  contradiction flag    │
+  │  similarity baseline   │
+  └────────────┬───────────┘
+               │
+               ▼
+  ┌──────────────────────────────────┐
+  │   FAITHFUL  ━━━━━━  HALLUCINATED │
+  │   + confidence score             │
+  │   + plain-English summary        │
+  └──────────────────────────────────┘
 ```
 
----
+### Aggregation Rules
 
-## 📦 Data Pipeline
+| Condition | Verdict |
+|---|---|
+| ≥ 60% of claims are `ENTAILED` | ✅ `FAITHFUL` |
+| Any claim is `CONTRADICTION` above score threshold | ❌ `HALLUCINATED` |
+| Cosine similarity falls below 0.65 baseline | ❌ `HALLUCINATED` |
+| Claim is `NEUTRAL` (unsupported) | Treated as ❌ `HALLUCINATED` |
 
-Supports two major hallucination benchmarks:
+<br/>
 
-| Benchmark | Source | Samples | Tasks |
-|-----------|--------|---------|-------|
-| **HaluEval** | [RUCAIBox/HaluEval](https://github.com/RUCAIBox/HaluEval) | 35K | QA, Dialogue, Summarization, General |
-| **TRUE** | [google-research/true](https://github.com/google-research/true) | 11 datasets | FRANK, QAGS, BEGIN, Q², DialFact, VitaminC, PAWS |
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
 
-### HaluEval only
+<br/>
 
-```bash
-# Single split (qa / dialogue / summarization / general)
-python -m training.data_pipeline --source halueval --halueval-split qa --max-samples 1000
+## 🐳 Docker Deployment
 
-# All HaluEval splits combined
-python -m training.data_pipeline --source halueval --halueval-split all
-```
-
-### TRUE benchmark only
-
-```bash
-# Default lightweight TRUE datasets (FRANK, QAGS, BEGIN, Q², DialFact)
-python -m training.data_pipeline --source true
-
-# Specific TRUE datasets
-python -m training.data_pipeline --source true --true-datasets frank,qags_cnndm,vitc,begin
-```
-
-### Combined (HaluEval + TRUE)
-
-```bash
-python -m training.data_pipeline --source combined --halueval-split all --true-datasets frank,qags_cnndm,begin
-```
-
-Outputs: `data/train.parquet`, `data/val.parquet`, `data/test.parquet`
-
----
-
-## 🏋️ Training (Optional Ensemble)
-
-```bash
-# Train on HaluEval QA
-python -m training.train_ensemble --source halueval --halueval-split qa --max-samples 200
-
-# Train on combined HaluEval + TRUE for stronger generalization
-python -m training.train_ensemble \
-  --source combined \
-  --halueval-split all \
-  --true-datasets frank,qags_cnndm,begin \
-  --max-samples 300 \
-  --model-type xgboost \
-  --output models/ensemble.pkl
-```
-
----
-
-## 📈 Evaluation
-
-```bash
-# Evaluate on cached test split
-python -m evaluation.evaluate --data-dir data --split test --max-samples 100
-
-# Evaluate directly on HaluEval QA
-python -m evaluation.evaluate --source halueval --halueval-split qa --max-samples 50
-
-# Evaluate on TRUE benchmark
-python -m evaluation.evaluate --source true --true-datasets frank,qags_cnndm --max-samples 50
-
-# Evaluate on combined data with per-dataset breakdown
-python -m evaluation.evaluate --source combined --max-samples 100 --output evaluation/metrics.json
-```
-
-Outputs: balanced accuracy, precision, recall, F1, ROC AUC, confusion matrix, per-dataset breakdown.
-
----
-
-## 🐳 Docker
-
-### Build
+### Build the Image
 
 ```bash
 docker build -t hallucination-hunter .
 ```
 
-### Run
+### Run the Container
 
 ```bash
 docker run -p 8000:8000 hallucination-hunter
 ```
 
-### Test
+### Verify It's Working
 
 ```bash
 curl -X POST http://localhost:8000/detect \
   -H "Content-Type: application/json" \
-  -d '{"source": "Python was created by Guido van Rossum.", "response": "Python was created by Linus Torvalds."}'
+  -d '{
+    "source": "Python was created by Guido van Rossum.",
+    "response": "Python was created by Linus Torvalds."
+  }'
 ```
 
----
+Expected output:
 
-## 🧪 Google Colab
-
-```python
-# Install dependencies
-!pip install fastapi uvicorn torch transformers sentence-transformers spacy scikit-learn pandas datasets matplotlib seaborn tqdm xgboost
-!python -m spacy download en_core_web_sm
-
-# Clone or upload the hallucination_hunter/ folder, then:
-import sys
-sys.path.insert(0, '/content/hallucination_hunter')
-
-from app.inference.pipeline import detect
-
-result = detect(
-    source="The Great Wall of China is over 13,000 miles long.",
-    response="The Great Wall of China is 500 miles long and located in Japan."
-)
-
-print(result.label)       # HALLUCINATED
-print(result.confidence)  # ~0.9
-for c in result.claims:
-    print(f"  {c.label}: {c.text} ({c.score:.2f})")
+```json
+{
+  "verdict": "HALLUCINATED",
+  "confidence": 0.96,
+  "summary": "1 contradictory claim detected → response is hallucinated"
+}
 ```
 
-### Run API in Colab with ngrok
+<br/>
 
-```python
-!pip install pyngrok
-from pyngrok import ngrok
-import nest_asyncio
-nest_asyncio.apply()
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
 
-# Start ngrok tunnel
-public_url = ngrok.connect(8000)
-print(f"Public URL: {public_url}")
-
-# Run server
-!uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
----
+<br/>
 
 ## ⚙️ Configuration
 
-All settings in `configs/settings.py`:
+All settings live in `configs/settings.py` — one file, no scattered environment variables.
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `similarity_threshold` | 0.65 | Baseline similarity cutoff |
-| `entailment_fraction_threshold` | 0.60 | Min entailed fraction for FAITHFUL |
-| `nli_batch_size` | 32 | NLI inference batch size |
-| `max_claims` | 50 | Max claims extracted per response |
+```python
+# configs/settings.py
 
----
+similarity_threshold           = 0.65   # Minimum cosine similarity to pass baseline
+entailment_fraction_threshold  = 0.60   # Min entailed fraction for FAITHFUL verdict
+nli_batch_size                 = 32     # NLI model inference batch size
+max_claims                     = 50     # Max claims extracted per response
+nli_model_id                   = "cross-encoder/nli-deberta-v3-small"
+similarity_model_id            = "sentence-transformers/all-mpnet-base-v2"
+```
+
+| Setting | Default | Effect |
+|---|---|---|
+| `similarity_threshold` | `0.65` | Lower = more permissive baseline check |
+| `entailment_fraction_threshold` | `0.60` | Lower = easier to pass as FAITHFUL |
+| `nli_batch_size` | `32` | Higher = faster inference, more VRAM |
+| `max_claims` | `50` | Caps extraction on very long responses |
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 📦 Scope & Limitations
+
+This system verifies claims **only against the provided source passage**. It is a **grounding checker**, not a world-knowledge fact-checker.
+
+**It does NOT:**
+- Access external knowledge or the internet
+- Validate facts beyond the given source document
+- Replace domain-expert review for high-stakes decisions
+
+**Performance depends on:**
+- Quality and completeness of the source passage
+- Clarity and atomicity of claims in the AI response
+- NLI model confidence thresholds (all tunable in config)
+
+> **Ideal use case:** RAG (Retrieval-Augmented Generation) pipelines where a retrieved source document is always available. Hallucination Hunter acts as the final verification gate before responses reach users.
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 📈 Future Roadmap
+
+| Status | Feature |
+|---|---|
+| 🔜 | **Web UI** — Browser-based drag-and-drop interface for non-technical users |
+| 🔜 | **Multilingual Support** — Hindi, French, German, Spanish |
+| 🔜 | **PDF / Document Input** — Upload source as a PDF, not just raw text |
+| 🔜 | **LangChain Integration** — Plug-in hallucination guard for LangChain pipelines |
+| 🔜 | **Streaming Verdicts** — Stream per-claim results as they are computed |
+| 🔜 | **Webhook Support** — Fire results to Slack, Discord, or any endpoint |
+| 🔜 | **Batch API** — Verify hundreds of response-source pairs in one request |
+| 🔜 | **PyPI Package** — `pip install hallucination-hunter` |
+| 🔜 | **Confidence Calibration** — Platt scaling for better probability estimates |
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🤝 Contributing
+
+All contributions are welcome — from bug fixes to new features to documentation improvements.
+
+### How to Contribute
+
+```bash
+# 1. Fork the repository on GitHub
+
+# 2. Clone your fork locally
+git clone https://github.com/YOUR-USERNAME/hallucination-hunter.git
+cd hallucination-hunter
+
+# 3. Create a feature branch
+git checkout -b feature/your-feature-name
+
+# 4. Make your changes, then stage and commit
+git add .
+git commit -m "feat: clear description of what you changed"
+
+# 5. Push to your fork
+git push origin feature/your-feature-name
+
+# 6. Open a Pull Request on GitHub 🎉
+```
+
+### Contribution Standards
+
+- ✅ Keep code readable and well-commented
+- ✅ Write tests for new logic where possible
+- ✅ Update the README if your change affects usage or architecture
+- ✅ Use descriptive commit messages (`feat:`, `fix:`, `docs:`, `refactor:`)
+- ❤️ Be respectful — everyone is learning
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
 
 ## 📜 License
 
-MIT
+```
+MIT License — Copyright (c) 2026 Harsh Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software — subject to the condition that the above copyright
+notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+```
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+
+<br/>
+
+## 🌟 Support the Project
+
+If Hallucination Hunter helped you catch something an LLM got wrong, here's how to give back:
+
+<div align="center">
+
+| Action | Impact |
+|:---:|:---:|
+| ⭐ **Star the repo** | Helps others discover this tool |
+| 🍴 **Fork it** | Build your own verification layer on top |
+| 🐛 **Open an issue** | Help improve accuracy and reliability |
+| 📢 **Share it** | Tweet it, write about it, tell your team |
+| 💬 **Give feedback** | Even a comment goes a long way |
+
+<br/>
+
+[![Star this repo](https://img.shields.io/badge/⭐%20Star%20this%20repo-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter)
+[![Fork it](https://img.shields.io/badge/🍴%20Fork%20it-6366f1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter/fork)
+[![Open an Issue](https://img.shields.io/badge/🐛%20Open%20an%20Issue-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter/issues)
+
+</div>
+
+<br/>
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:24243e&height=130&section=footer&animation=fadeIn" width="100%"/>
+
+**Made with ❤️ by [Harsh Kumar](https://github.com/hrshjha)**
+
+*"The truth is out there — now you have a tool to find it."*
+
+<br/>
+
+[![GitHub followers](https://img.shields.io/github/followers/hrshjha?style=social)](https://github.com/hrshjha)
+&nbsp;&nbsp;
+[![Twitter Follow](https://img.shields.io/twitter/follow/m_eharsh?style=social)](https://twitter.com/m_eharsh)
+
+</div>

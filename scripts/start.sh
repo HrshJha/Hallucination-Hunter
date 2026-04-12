@@ -1,6 +1,6 @@
 #!/bin/bash
 # Move to the script's directory (hallucination_hunter)
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 echo "=========================================="
 echo "🚀 Starting Hallucination Hunter API server"

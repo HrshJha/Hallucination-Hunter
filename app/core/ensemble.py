@@ -14,8 +14,8 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from app.claims.extractor import extract_claims, extract_source_sentences
-from app.inference.nli import classify_claims_against_source
-from app.inference.similarity import similarity_scores
+from app.core.nli import classify_claims_against_source
+from app.core.similarity import similarity_scores
 
 # ── Feature extraction ───────────────────────────────────────────────
 

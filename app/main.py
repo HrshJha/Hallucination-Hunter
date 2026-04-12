@@ -42,7 +42,7 @@ app.add_middleware(
 app.include_router(router)
 
 # Serve the Web UI at root
-INDEX_HTML = os.path.join(PROJECT_ROOT, "index.html")
+INDEX_HTML = os.path.join(PROJECT_ROOT, "ui", "index.html")
 
 
 @app.get("/", include_in_schema=False)

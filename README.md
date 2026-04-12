@@ -149,35 +149,28 @@ This matters because **partial hallucinations are the hardest to catch** — a r
 ```
 hallucination_hunter/
 │
-├── 📁 app/                              # Core application
-│   ├── 🐍 main.py                       # FastAPI entry point & app factory
+├── 📁 app/                              # Core backend (FastAPI + ML pipeline)
+│   ├── 🐍 main.py                       # App entry point (FastAPI instance)
 │   │
-│   ├── 📁 api/
+│   ├── 📁 api/                          # API layer (routing only)
 │   │   └── 🐍 routes.py                 # /detect · /detect/visualize · /health
 │   │
-│   ├── 📁 inference/
+│   ├── 📁 core/                         # Core logic (ML pipeline)
+│   │   ├── 🐍 pipeline.py               # Orchestrates full flow
+│   │   ├── 🐍 aggregator.py             # Final verdict logic
 │   │   ├── 🐍 nli.py                    # DeBERTa-v3 NLI cross-encoder
-│   │   ├── 🐍 similarity.py             # Sentence-Transformers cosine scoring
-│   │   ├── 🐍 aggregator.py             # Rules engine → FAITHFUL / HALLUCINATED
-│   │   ├── 🐍 pipeline.py               # End-to-end orchestration
+│   │   ├── 🐍 similarity.py             # Semantic similarity scoring
 │   │   └── 🐍 ensemble.py               # Optional LR / XGBoost stacking
 │   │
-│   ├── 📁 models/
-│   │   └── 🐍 schemas.py                # Pydantic request & response models
-│   │
-│   ├── 📁 claims/
+│   ├── 📁 claims/                       # Input preprocessing
 │   │   └── 🐍 extractor.py              # spaCy segmentation + claim filtering
+│   │
+│   ├── 📁 schemas/                      # Pydantic request & response models
+│   │   └── 🐍 schemas.py
 │   │
 │   └── 📁 utils/
 │       ├── 🐍 helpers.py                # Timers, truncation utilities
 │       └── 🐍 visualization.py          # Heatmap → base64 PNG
-│
-├── 📁 training/
-│   ├── 🐍 data_pipeline.py              # HaluEval + TRUE loader & preprocessor
-│   └── 🐍 train_ensemble.py             # Ensemble training script
-│
-├── 📁 evaluation/
-│   └── 🐍 evaluate.py                   # Balanced accuracy, F1, ROC AUC
 │
 ├── 📁 configs/
 │   └── 🐍 settings.py                   # Single source of truth for all config
@@ -190,9 +183,25 @@ hallucination_hunter/
 ├── 📁 models/                           # Saved ensemble weights
 │   └── ensemble.pkl
 │
+├── 📁 training/
+│   ├── 🐍 data_pipeline.py              # HaluEval + TRUE loader & preprocessor
+│   └── 🐍 train_ensemble.py             # Ensemble training script
+│
+├── 📁 evaluation/
+│   └── 🐍 evaluate.py                   # Balanced accuracy, F1, ROC AUC
+│
+├── 📁 ui/                               # Frontend (browser interface)
+│   └── 🌐 index.html
+│
+├── 📁 scripts/                          # All execution scripts in one place
+│   ├── 🐍 run_demo.py
+│   ├── 🐍 serve_ui.py
+│   └── 🔧 start.sh
+│
 ├── 🐳 Dockerfile
 ├── 📋 requirements.txt
-└── 📄 README.md
+├── 📄 README.md
+└── 🚫 .gitignore
 ```
 
 <br/>

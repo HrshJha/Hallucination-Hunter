@@ -8,7 +8,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![HuggingFace](https://img.shields.io/badge/🤗-Transformers-FFD21E?style=for-the-badge)](https://huggingface.co)
 [![License](https://img.shields.io/badge/License-MIT-a855f7?style=for-the-badge)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/harsh/hallucination-hunter?style=for-the-badge&logo=github&color=f59e0b&labelColor=1a1a2e)](https://github.com/harsh/hallucination-hunter)
+[![Stars](https://img.shields.io/github/stars/hrshjha/hallucination-hunter?style=for-the-badge&logo=github&color=f59e0b&labelColor=1a1a2e)](https://github.com/hrshjha/hallucination-hunter)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-22c55e?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
 
 <br/>
@@ -29,7 +29,7 @@
 
 <br/>
 
-**Made with ❤️ by [Harsh Kumar](https://github.com/harsh)**
+**Made with ❤️ by [Harsh Kumar](https://github.com/hrshjha)**
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
 
@@ -226,7 +226,7 @@ git --version
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/harsh/hallucination-hunter.git
+git clone https://github.com/hrshjha/hallucination-hunter.git
 cd hallucination-hunter
 ```
 
@@ -634,9 +634,9 @@ If Hallucination Hunter helped you catch something an LLM got wrong, here's how 
 
 <br/>
 
-[![Star this repo](https://img.shields.io/badge/⭐%20Star%20this%20repo-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/harsh/hallucination-hunter)
-[![Fork it](https://img.shields.io/badge/🍴%20Fork%20it-6366f1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/harsh/hallucination-hunter/fork)
-[![Open an Issue](https://img.shields.io/badge/🐛%20Open%20an%20Issue-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://github.com/harsh/hallucination-hunter/issues)
+[![Star this repo](https://img.shields.io/badge/⭐%20Star%20this%20repo-f59e0b?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter)
+[![Fork it](https://img.shields.io/badge/🍴%20Fork%20it-6366f1?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter/fork)
+[![Open an Issue](https://img.shields.io/badge/🐛%20Open%20an%20Issue-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hrshjha/hallucination-hunter/issues)
 
 </div>
 
@@ -646,14 +646,14 @@ If Hallucination Hunter helped you catch something an LLM got wrong, here's how 
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:24243e&height=130&section=footer&animation=fadeIn" width="100%"/>
 
-**Made with ❤️ by [Harsh Kumar](https://github.com/harsh)**
+**Made with ❤️ by [Harsh Kumar](https://github.com/hrshjha)**
 
 *"The truth is out there — now you have a tool to find it."*
 
 <br/>
 
-[![GitHub followers](https://img.shields.io/github/followers/harsh?style=social)](https://github.com/harsh)
+[![GitHub followers](https://img.shields.io/github/followers/hrshjha?style=social)](https://github.com/hrshjha)
 &nbsp;&nbsp;
-[![Twitter Follow](https://img.shields.io/twitter/follow/harsh?style=social)](https://twitter.com/harsh)
+[![Twitter Follow](https://img.shields.io/twitter/follow/m_eharsh?style=social)](https://twitter.com/m_eharsh)
 
 </div>

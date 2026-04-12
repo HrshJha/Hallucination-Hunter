@@ -34,7 +34,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from app.core.pipeline import detect
+from core.pipeline import detect
 
 
 # ── Core evaluation ──────────────────────────────────────────────────

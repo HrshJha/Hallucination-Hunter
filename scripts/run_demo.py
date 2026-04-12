@@ -18,9 +18,9 @@ if PROJECT_ROOT not in sys.path:
 
 # ── 2. Run detection ────────────────────────────────────────────────
 
-from app.core.pipeline import detect
-from app.utils.visualization import plot_alignment_matrix
-from app.claims.extractor import extract_source_sentences
+from core.pipeline import detect
+from utils.visualization import plot_alignment_matrix
+from claims.extractor import extract_source_sentences
 
 # Example 1: Faithful response
 source_1 = (

@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from app.core.ensemble import extract_features, train_ensemble
+from core.ensemble import extract_features, train_ensemble
 from training.data_pipeline import (
     load_halueval,
     load_halueval_all,

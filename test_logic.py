@@ -12,7 +12,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from app.core.pipeline import detect
+from core.pipeline import detect
 
 
 def run(name, source, response, expected_verdict):

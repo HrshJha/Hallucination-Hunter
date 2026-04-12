@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /hallucination_hunter
 
 # System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -10,9 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Download spaCy model
-RUN python -m spacy download en_core_web_sm
 
 # Copy source
 COPY . .

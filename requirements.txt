@@ -1,0 +1,28 @@
+# Core
+fastapi
+uvicorn[standard]
+pydantic
+
+# ML / NLP
+torch
+transformers
+sentence-transformers
+spacy
+
+# Data / Evaluation
+numpy
+scikit-learn
+pandas
+datasets
+
+# Visualization (optional)
+matplotlib
+seaborn
+
+# Ensemble (optional)
+xgboost
+
+# Utilities
+requests
+python-dotenv
+tqdm

@@ -3,7 +3,12 @@ uvicorn[standard]
 pydantic
 
 # ML / NLI
-torch
+# NOTE: torch is NOT listed here on purpose.
+# It is installed separately via the Render build command / Dockerfile
+# with --index-url https://download.pytorch.org/whl/cpu to get the
+# CPU-only build (~200 MB).  If torch appears here, pip re-resolves it
+# from PyPI and installs the CUDA build (~2 GB + nvidia packages),
+# which OOMs on Render's 512 MB free tier.
 transformers
 sentence-transformers
 

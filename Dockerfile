@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Python deps — install CPU-only torch first, then everything else
+# Python deps — install CPU-only torch FIRST, then everything else.
+# torch is NOT in requirements.txt to prevent pip from re-resolving
+# it from PyPI (which gives the ~2 GB CUDA build).
 COPY requirements.txt .
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements.txt && \

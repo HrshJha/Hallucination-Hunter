@@ -1,24 +1,14 @@
-# Core
 fastapi
 uvicorn[standard]
 pydantic
 
-# ML / NLP (lighter + stable)
 torch
 transformers
 sentence-transformers
-spacy==3.8.0
 
-# Data / Evaluation
 numpy
 scikit-learn
-pandas
 
-# Visualization
-matplotlib
-seaborn
-
-# Utilities
 requests
 python-dotenv
 tqdm

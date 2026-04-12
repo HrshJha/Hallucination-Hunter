@@ -3,6 +3,9 @@ Baseline Similarity Model
 --------------------------
 Uses sentence-transformers (all-mpnet-base-v2) to compute cosine
 similarity between source and response embeddings.
+
+All heavy imports (sentence_transformers) are deferred to first use so
+that FastAPI can bind the port immediately on Render.
 """
 
 from __future__ import annotations
@@ -10,18 +13,19 @@ from __future__ import annotations
 from typing import List, Tuple
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 from app.configs.settings import settings
 
 # ── Lazy singleton ───────────────────────────────────────────────────
 
-_model: SentenceTransformer | None = None
+_model = None
 
 
-def _get_model() -> SentenceTransformer:
+def _get_model():
     global _model
     if _model is None:
+        from sentence_transformers import SentenceTransformer
+
         _model = SentenceTransformer(
             settings.model.similarity_model,
             device=settings.inference.device,

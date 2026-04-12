@@ -15,13 +15,14 @@ if [ ! -d ".venv" ]; then
     python3 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
+    python -m spacy download en_core_web_sm
 else
     echo "✅ Found virtual environment (.venv)."
     source .venv/bin/activate
 fi
 
-# Use PORT env var with fallback to 8001
-PORT="${PORT:-8001}"
-echo "🌐 Starting FastAPI on http://localhost:${PORT}"
+# Use PORT env var with fallback to 10000
+PORT="${PORT:-10000}"
+echo "🌐 Starting FastAPI on http://0.0.0.0:${PORT}"
 # Use exec to replace the shell so signals pass through properly
 exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT}"

@@ -37,16 +37,34 @@ class ThresholdConfig:
     neutral_idx: int = 2
 
 
-@dataclass
 class InferenceConfig:
-    nli_batch_size: int = 32
-    similarity_batch_size: int = 64
-    max_claims: int = 50
-    device: str = ""  # resolved lazily
+    """Inference settings with truly lazy device detection.
 
-    def __post_init__(self):
-        if not self.device:
-            self.device = self._detect_device()
+    ``device`` is only resolved the first time it is read, so
+    ``import torch`` never runs during module import / app startup.
+    """
+
+    def __init__(
+        self,
+        nli_batch_size: int = 32,
+        similarity_batch_size: int = 64,
+        max_claims: int = 50,
+        device: str = "",
+    ):
+        self.nli_batch_size = nli_batch_size
+        self.similarity_batch_size = similarity_batch_size
+        self.max_claims = max_claims
+        self._device = device  # store raw value; empty = detect later
+
+    @property
+    def device(self) -> str:
+        if not self._device:
+            self._device = self._detect_device()
+        return self._device
+
+    @device.setter
+    def device(self, value: str) -> None:
+        self._device = value
 
     @staticmethod
     def _detect_device() -> str:

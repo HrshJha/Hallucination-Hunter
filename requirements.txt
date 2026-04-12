@@ -7,6 +7,9 @@ torch
 transformers
 sentence-transformers
 
+# NLP
+spacy
+
 # Numerical
 numpy
 scikit-learn

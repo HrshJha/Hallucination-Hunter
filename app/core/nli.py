@@ -3,6 +3,9 @@ NLI Engine (Core)
 -----------------
 Cross-encoder NLI using ``cross-encoder/nli-deberta-v3-small``.
 Classifies each (claim, source) pair as entailment / contradiction / neutral.
+
+All heavy imports (torch, transformers) are deferred to first use so that
+FastAPI can bind the port immediately on Render without timing out.
 """
 
 from __future__ import annotations
@@ -10,8 +13,6 @@ from __future__ import annotations
 from typing import Dict, List, Tuple
 
 import numpy as np
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from app.configs.settings import settings
 
@@ -35,11 +36,16 @@ def _get_label_map() -> Dict[int, str]:
 
 _tokenizer = None
 _model = None
+_torch = None  # lazy reference to the torch module
 
 
 def _load():
-    global _tokenizer, _model
+    global _tokenizer, _model, _torch
     if _tokenizer is None:
+        import torch
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+        _torch = torch
         _tokenizer = AutoTokenizer.from_pretrained(settings.model.nli_model)
         _model = AutoModelForSequenceClassification.from_pretrained(settings.model.nli_model)
         _model.to(settings.inference.device)
@@ -89,9 +95,9 @@ def classify_pairs(
             return_tensors="pt",
         ).to(settings.inference.device)
 
-        with torch.no_grad():
+        with _torch.no_grad():
             logits = _model(**encoded).logits
-            probs = torch.softmax(logits, dim=-1).cpu().numpy()
+            probs = _torch.softmax(logits, dim=-1).cpu().numpy()
 
         for prob_row in probs:
             label_idx = int(np.argmax(prob_row))

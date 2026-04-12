@@ -13,10 +13,12 @@ from typing import Optional
 @dataclass
 class ModelConfig:
     # Sentence-Transformer (baseline similarity)
-    similarity_model: str = "sentence-transformers/all-mpnet-base-v2"
+    # all-MiniLM-L6-v2: 80 MB — fits Render free tier (512 MB)
+    similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
     # Cross-encoder NLI (core engine)
-    nli_model: str = "cross-encoder/nli-deberta-v3-small"
+    # nli-MiniLM2-L6-H768: 80 MB, same 3-class labels (contradiction/entailment/neutral)
+    nli_model: str = "cross-encoder/nli-MiniLM2-L6-H768"
 
     # spaCy pipeline for claim extraction
     spacy_model: str = "en_core_web_sm"

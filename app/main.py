@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from app.api.routes import router
+from api.routes import router
 
 app = FastAPI(
     title="Hallucination Hunter",

@@ -1,39 +1,15 @@
 """
-Claim Extraction Module
------------------------
-Breaks an AI-generated response into atomic claims using spaCy
-sentence segmentation, with optional filtering of questions and meta-text.
+Claim Extraction Module (DEPLOY-SAFE VERSION)
+--------------------------------------------
+No spaCy. Uses simple sentence splitting.
 """
 
 from __future__ import annotations
-
 import re
 from typing import List
 
-import spacy
-from spacy.language import Language
 
-from configs.settings import settings
-
-# ── Lazy-loaded spaCy model ─────────────────────────────────────────
-
-_nlp: Language | None = None
-
-
-def _get_nlp() -> Language:
-    global _nlp
-    if _nlp is None:
-        try:
-            _nlp = spacy.load(settings.model.spacy_model)
-        except OSError:
-            # Auto-download if missing (handy for Colab / Docker first-run)
-            from spacy.cli import download
-            download(settings.model.spacy_model)
-            _nlp = spacy.load(settings.model.spacy_model)
-    return _nlp
-
-
-# ── Filters ──────────────────────────────────────────────────────────
+# ── Filters ──────────────────────────────────────────
 
 _META_PATTERNS = re.compile(
     r"^(note:|disclaimer:|as an ai|i cannot|i'?m not sure|"
@@ -55,7 +31,15 @@ def _is_too_short(sent: str, min_words: int = 3) -> bool:
     return len(sent.strip().split()) < min_words
 
 
-# ── Public API ───────────────────────────────────────────────────────
+# ── Simple sentence splitter ──────────────────────────
+
+def _split_sentences(text: str) -> List[str]:
+    # basic split on punctuation
+    sentences = re.split(r'[.!?]+', text)
+    return [s.strip() for s in sentences if s.strip()]
+
+
+# ── Public API ───────────────────────────────────────
 
 def extract_claims(
     text: str,
@@ -64,33 +48,11 @@ def extract_claims(
     min_words: int = 3,
     max_claims: int | None = None,
 ) -> List[str]:
-    """
-    Extract atomic claims from *text*.
 
-    Parameters
-    ----------
-    text : str
-        The AI-generated response.
-    filter_questions : bool
-        Drop sentences that end with '?'.
-    filter_meta : bool
-        Drop sentences that match common meta-text patterns.
-    min_words : int
-        Minimum word count to keep a sentence.
-    max_claims : int | None
-        Cap the number of returned claims. ``None`` → no cap.
-
-    Returns
-    -------
-    list[str]
-        Cleaned list of claim strings.
-    """
-    nlp = _get_nlp()
-    doc = nlp(text)
+    sentences = _split_sentences(text)
 
     claims: List[str] = []
-    for sent in doc.sents:
-        s = sent.text.strip()
+    for s in sentences:
         if not s:
             continue
         if filter_questions and _is_question(s):
@@ -108,7 +70,4 @@ def extract_claims(
 
 
 def extract_source_sentences(text: str) -> List[str]:
-    """Split the source passage into sentences (no filtering)."""
-    nlp = _get_nlp()
-    doc = nlp(text)
-    return [sent.text.strip() for sent in doc.sents if sent.text.strip()]
+    return _split_sentences(text)

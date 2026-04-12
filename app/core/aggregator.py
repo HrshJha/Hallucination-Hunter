@@ -19,7 +19,7 @@ def _map_nli_label(raw: str) -> str:
 
 
 # ─────────────────────────────────────────────
-# 2. SAFE SIMILARITY (NO ZERO)
+# 2. SAFE SIMILARITY
 # ─────────────────────────────────────────────
 
 def _safe_similarity(raw_value: float) -> float:
@@ -29,34 +29,33 @@ def _safe_similarity(raw_value: float) -> float:
 
 
 # ─────────────────────────────────────────────
-# 3. CLASSIFICATION (FINAL FIX)
+# 3. CLAIM CLASSIFICATION (FINAL)
 # ─────────────────────────────────────────────
 
 def classify_claim(nli_label: str, similarity: float) -> str:
     mapped = _map_nli_label(nli_label)
 
-    # 1. Hard contradiction
+    # 🚨 HARD RULE
     if mapped == "CONTRADICTION":
         return "CONTRADICTION"
 
-    # 2. Strong similarity override (MOST IMPORTANT FIX)
-    if similarity >= 0.75:
-        return "ENTAILED"
-
-    # 3. Medium similarity
+    # 🔥 HIGH similarity dominates
     if similarity >= 0.70:
         return "ENTAILED"
 
-    # 4. NLI entailment
-    if mapped == "ENTAILED":
+    # ✅ Medium + NLI support
+    if mapped == "ENTAILED" and similarity >= 0.55:
         return "ENTAILED"
 
-    # 5. Default
+    # ❌ Low similarity
+    if similarity < 0.45:
+        return "UNSUPPORTED"
+
     return "UNSUPPORTED"
 
 
 # ─────────────────────────────────────────────
-# 4. AGGREGATION (STRICT)
+# 4. AGGREGATION (FINAL FIX)
 # ─────────────────────────────────────────────
 
 def aggregate_results(processed_claims: List[Dict]) -> Dict:
@@ -91,13 +90,19 @@ def aggregate_results(processed_claims: List[Dict]) -> Dict:
 
     avg_sim = total_sim / n
 
-    # STRICT VERDICT (NEVER LEAK CLAIM LABEL)
+    # 🔥 FINAL DECISION LOGIC
+
+    # 1. ANY contradiction → hallucinated
     if contradiction > 0:
         verdict = "HALLUCINATED"
-    elif unsupported > 0:
-        verdict = "HALLUCINATED"
-    else:
+
+    # 2. Majority entailed → faithful
+    elif entailed / n >= 0.6:
         verdict = "FAITHFUL"
+
+    # 3. Otherwise → hallucinated
+    else:
+        verdict = "HALLUCINATED"
 
     return {
         "verdict": verdict,
@@ -111,16 +116,18 @@ def aggregate_results(processed_claims: List[Dict]) -> Dict:
 
 
 # ─────────────────────────────────────────────
-# 5. CONFIDENCE (NO 1.00 EVER)
+# 5. CONFIDENCE (SMART)
 # ─────────────────────────────────────────────
 
 def compute_confidence(metrics: Dict) -> float:
     avg_sim = metrics.get("avg_similarity", 0.0)
     ent_frac = metrics.get("entailed_fraction", 0.0)
+    contr = metrics.get("contradiction_count", 0)
 
-    raw = 0.6 * avg_sim + 0.4 * ent_frac
+    # weighted confidence
+    raw = 0.5 * avg_sim + 0.4 * ent_frac + 0.1 * (1 - min(contr, 1))
 
-    return round(min(max(raw, 0.50), 0.95), 2)
+    return round(min(max(raw, 0.55), 0.95), 2)
 
 
 # ─────────────────────────────────────────────
@@ -132,13 +139,13 @@ def generate_summary(metrics: Dict) -> str:
     contr = metrics.get("contradiction_count", 0)
 
     if contr == 0 and unsup == 0:
-        return "All claims are supported by the source → response is faithful"
+        return "All claims are supported → response is faithful"
 
-    return f"{unsup} unsupported and {contr} contradictory claims detected → response is hallucinated"
+    return f"{unsup} unsupported and {contr} contradictory claims → response is hallucinated"
 
 
 # ─────────────────────────────────────────────
-# MAIN PIPELINE
+# 7. MAIN PIPELINE
 # ─────────────────────────────────────────────
 
 def aggregate(
@@ -165,19 +172,17 @@ def aggregate(
     for i, claim in enumerate(claim_nli_results):
         nli_label = claim.get("label", "")
 
-        # SAFE SIMILARITY EXTRACTION
         if alignment_matrix and i < len(alignment_matrix) and alignment_matrix[i]:
             raw_sim = max(alignment_matrix[i])
         else:
             raw_sim = 0.0
 
         similarity = _safe_similarity(raw_sim)
-
         final_label = classify_claim(nli_label, similarity)
 
         processed.append({
             "text": claim.get("text", ""),
-            "nli_label": _map_nli_label(nli_label),  # FIXED (no .lower())
+            "nli_label": _map_nli_label(nli_label),
             "similarity": similarity,
             "final_label": final_label,
         })

@@ -17,7 +17,7 @@ from app.claims.extractor import extract_claims, extract_source_sentences
 from app.core.nli import classify_claims_against_source
 from app.core.similarity import cosine_matrix
 from app.core.aggregator import aggregate
-from app.schemas.schemas import ClaimResult, DetectionResponse, DetectionMetrics
+from app.models.schemas import ClaimResult, DetectionResponse, DetectionMetrics
 from configs.settings import settings
 
 

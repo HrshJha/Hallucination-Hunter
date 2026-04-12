@@ -9,7 +9,7 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas.schemas import DetectionRequest, DetectionResponse
+from app.models.schemas import DetectionRequest, DetectionResponse
 from app.core.pipeline import detect
 from app.claims.extractor import extract_claims, extract_source_sentences
 from app.utils.visualization import plot_alignment_matrix

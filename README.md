@@ -758,6 +758,6 @@ If Hallucination Hunter helped you catch an AI lie, consider:
 
 <br/>
 
-[![GitHub](https://img.shields.io/badge/GitHub-harsh-181717?style=flat-square&logo=github)](https://github.com/harsh)
+[![GitHub](https://img.shields.io/badge/GitHub-harsh-181717?style=flat-square&logo=github)](https://github.com/hrshjha)
 
 </div>

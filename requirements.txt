@@ -2,13 +2,20 @@ fastapi
 uvicorn[standard]
 pydantic
 
+# ML / NLI
 torch
 transformers
 sentence-transformers
 
+# Numerical
 numpy
 scikit-learn
 
+# Visualization (used by app/utils/visualization.py)
+matplotlib
+seaborn
+
+# Utilities
 requests
 python-dotenv
 tqdm

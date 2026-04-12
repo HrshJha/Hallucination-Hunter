@@ -1,161 +1,790 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Hallucination Hunter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hallucination Hunter — AI Factual Consistency Detector</title>
+  <meta name="description" content="Detect hallucinations in AI-generated text. Submit a source passage and AI response to get a FAITHFUL/HALLUCINATED verdict with per-claim NLI breakdown and alignment heatmap." />
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- React 18 CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-<style>
-  
-body {
-  background:#020617;
-  color:#e5e7eb;
-  font-family:sans-serif;
-}
-.card {
-  background:#0f172a;
-  padding:16px;
-  border-radius:10px;
-  border:1px solid #1f2937;
-}
-</style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: {
+              50: '#f0f4ff',
+              100: '#e0e8ff',
+              200: '#c7d2fe',
+              700: '#1e2a4a',
+              800: '#141c33',
+              850: '#111827',
+              900: '#0b1120',
+              950: '#060a15',
+            },
+            neon: {
+              cyan: '#00f5d4',
+              blue: '#7b61ff',
+              pink: '#ff6b9d',
+              green: '#00e676',
+              red: '#ff5252',
+              yellow: '#ffd740',
+              orange: '#ff9100',
+            }
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'shimmer': 'shimmer 2s linear infinite',
+            'fade-up': 'fadeUp 0.6s ease-out forwards',
+            'scale-in': 'scaleIn 0.4s ease-out forwards',
+            'slide-right': 'slideRight 0.5s ease-out forwards',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(0, 245, 212, 0.15)' },
+              '50%': { boxShadow: '0 0 40px rgba(0, 245, 212, 0.3)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            scaleIn: {
+              '0%': { opacity: '0', transform: 'scale(0.9)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            slideRight: {
+              '0%': { opacity: '0', transform: 'translateX(-20px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #060a15;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(123, 97, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 245, 212, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(255, 107, 157, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #root { position: relative; z-index: 1; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0b1120; }
+    ::-webkit-scrollbar-thumb { background: #1e2a4a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2d3f6a; }
+
+    /* Textarea styling */
+    textarea:focus {
+      outline: none;
+      border-color: #7b61ff !important;
+      box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15), 0 0 20px rgba(123, 97, 255, 0.1);
+    }
+
+    /* Heatmap cell */
+    .heatmap-cell {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+    }
+    .heatmap-cell:hover {
+      transform: scale(1.35);
+      z-index: 10;
+      border-radius: 3px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    }
+
+    /* Tooltip */
+    .tooltip-container { position: relative; }
+    .tooltip-container .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #1e2a4a;
+      color: #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      z-index: 50;
+      pointer-events: none;
+      border: 1px solid rgba(123, 97, 255, 0.3);
+      transition: all 0.15s ease;
+    }
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Shimmer loading */
+    .shimmer-bg {
+      background: linear-gradient(90deg, transparent, rgba(123, 97, 255, 0.08), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s linear infinite;
+    }
+
+    /* Glass card */
+    .glass {
+      background: rgba(14, 20, 40, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(123, 97, 255, 0.1);
+    }
+
+    /* Button gradient */
+    .btn-gradient {
+      background: linear-gradient(135deg, #7b61ff 0%, #00f5d4 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(123, 97, 255, 0.35);
+    }
+    .btn-gradient:active {
+      transform: translateY(0);
+    }
+    .btn-gradient:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Confidence bar */
+    .confidence-bar {
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Stagger children animation */
+    .stagger-child { opacity: 0; animation: fadeUp 0.5s ease-out forwards; }
+    .stagger-child:nth-child(1) { animation-delay: 0.05s; }
+    .stagger-child:nth-child(2) { animation-delay: 0.1s; }
+    .stagger-child:nth-child(3) { animation-delay: 0.15s; }
+    .stagger-child:nth-child(4) { animation-delay: 0.2s; }
+    .stagger-child:nth-child(5) { animation-delay: 0.25s; }
+    .stagger-child:nth-child(6) { animation-delay: 0.3s; }
+    .stagger-child:nth-child(7) { animation-delay: 0.35s; }
+    .stagger-child:nth-child(8) { animation-delay: 0.4s; }
+    .stagger-child:nth-child(9) { animation-delay: 0.45s; }
+    .stagger-child:nth-child(10) { animation-delay: 0.5s; }
+
+    /* Pulse ring */
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      border: 2px solid currentColor;
+      animation: pulseRing 1.5s ease-out infinite;
+    }
+
+    /* Noise texture overlay */
+    .noise::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
 </head>
+<body class="noise">
+  <div id="root"></div>
 
-<body>
-<div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect, useMemo } = React;
 
-<script type="text/babel">
+    // ── API Configuration ────────────────────────────────────────
+    const API_URL =
+      window.location.hostname === "localhost"
+        ? "http://localhost:8001"
+        : "https://hallucination-hunter-io2j.onrender.com";
 
-const API_URL = "http://localhost:8001";
+    // ── Utility Functions ────────────────────────────────────────
+    function similarityToHSL(value) {
+      // 0.0 = red (0°) → 1.0 = blue (220°)
+      const hue = value * 220;
+      const sat = 70 + value * 20;
+      const light = 25 + value * 25;
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+    }
 
-function App() {
-  const [source,setSource]=React.useState("");
-  const [response,setResponse]=React.useState("");
-  const [result,setResult]=React.useState(null);
+    function labelColor(label) {
+      switch (label) {
+        case 'ENTAILED': return { bg: 'rgba(0,230,118,0.12)', border: 'rgba(0,230,118,0.4)', text: '#00e676', dot: '#00e676' };
+        case 'CONTRADICTION': return { bg: 'rgba(255,82,82,0.12)', border: 'rgba(255,82,82,0.4)', text: '#ff5252', dot: '#ff5252' };
+        case 'UNSUPPORTED': return { bg: 'rgba(255,215,64,0.12)', border: 'rgba(255,215,64,0.4)', text: '#ffd740', dot: '#ffd740' };
+        default: return { bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.3)', text: '#94a3b8', dot: '#94a3b8' };
+      }
+    }
 
-  const analyze = async () => {
-    const res = await fetch(API_URL+"/detect",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({source,response})
-    });
+    // ── Components ───────────────────────────────────────────────
 
-    const data = await res.json();
-    setResult(data);
-  };
+    function Header() {
+      return (
+        <header className="text-center pt-10 pb-6 px-4">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/20">
+                🔍
+              </div>
+            </div>
+            <div className="text-left">
+              <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent leading-tight">
+                Hallucination Hunter
+              </h1>
+              <p className="text-xs font-medium text-slate-500 tracking-widest uppercase mt-0.5">
+                AI Factual Consistency Engine
+              </p>
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+            Submit a source passage and an AI-generated response to detect hallucinations
+            with per-claim NLI analysis and semantic alignment heatmap.
+          </p>
+        </header>
+      );
+    }
 
-  const verdict = result?.label || "HALLUCINATED";
-  const confidence = result?.confidence ?? 0.5;
-  const claims = result?.claims || [];
-  const matrix = result?.alignment_matrix || [];
-
-  const verdictColor =
-    verdict === "FAITHFUL" ? "bg-green-900 border-green-500"
-    : "bg-red-900 border-red-500";
-
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-
-      <h1 className="text-3xl font-bold mb-6">Hallucination Hunter</h1>
-
-      <textarea
-        placeholder="Source Passage"
-        className="w-full p-3 mb-3 rounded bg-gray-800"
-        value={source}
-        onChange={e=>setSource(e.target.value)}
-      />
-
-      <textarea
-        placeholder="AI Response"
-        className="w-full p-3 mb-3 rounded bg-gray-800"
-        value={response}
-        onChange={e=>setResponse(e.target.value)}
-      />
-
-      <button
-        onClick={analyze}
-        className="bg-blue-600 px-5 py-2 rounded mb-6"
-      >
-        Detect Hallucinations
-      </button>
-
-      {result && (
-        <div className="space-y-6">
-
-          {/* 🔥 VERDICT */}
-          <div className={`card border ${verdictColor}`}>
-            <h2 className="text-xl font-bold">{verdict}</h2>
-            <p>Confidence: {(confidence*100).toFixed(1)}%</p>
+    function InputSection({ source, setSource, response, setResponse, onDetect, loading }) {
+      return (
+        <section className="glass rounded-2xl p-6 md:p-8 animate-fade-up" id="input-section">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+            <h2 className="text-lg font-semibold text-slate-200">Input</h2>
           </div>
 
-          {/* 🔥 CLAIMS */}
-          <div className="card">
-            <h3 className="font-semibold mb-3">Claim Breakdown</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Source */}
+            <div>
+              <label htmlFor="source-input" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                📄 Source Passage
+              </label>
+              <textarea
+                id="source-input"
+                className="w-full h-44 bg-surface-900/80 border border-surface-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 resize-none font-sans leading-relaxed transition-all duration-300"
+                placeholder="Paste the original reference text here..."
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                spellCheck={false}
+              />
+            </div>
+            {/* Response */}
+            <div>
+              <label htmlFor="response-input" className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                🤖 AI Response
+              </label>
+              <textarea
+                id="response-input"
+                className="w-full h-44 bg-surface-900/80 border border-surface-700/60 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 resize-none font-sans leading-relaxed transition-all duration-300"
+                placeholder="Paste the AI-generated answer to verify..."
+                value={response}
+                onChange={(e) => setResponse(e.target.value)}
+                spellCheck={false}
+              />
+            </div>
+          </div>
 
-            {claims.map((c,i)=>{
-              const label = c.label?.toUpperCase();
+          <div className="flex justify-center mt-6">
+            <button
+              id="detect-button"
+              onClick={onDetect}
+              disabled={loading || !source.trim() || !response.trim()}
+              className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-surface-950 tracking-wide flex items-center gap-2 disabled:opacity-40"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Analyzing…
+                </>
+              ) : (
+                <>
+                  <span>⚡</span>
+                  Detect Hallucinations
+                </>
+              )}
+            </button>
+          </div>
+        </section>
+      );
+    }
 
-              const color =
-                label === "ENTAILMENT" ? "text-green-400"
-                : label === "CONTRADICTION" ? "text-red-400"
-                : "text-yellow-400";
+    function LoadingOverlay() {
+      return (
+        <div className="glass rounded-2xl p-10 text-center animate-scale-in">
+          <div className="relative inline-block mb-5">
+            <div className="w-16 h-16 rounded-full border-4 border-surface-700 border-t-purple-400 animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-purple-500/20 animate-ping"></div>
+            </div>
+          </div>
+          <p className="text-lg font-semibold text-slate-300 mb-1">Analyzing Response…</p>
+          <p className="text-sm text-slate-500">Running NLI inference & semantic similarity</p>
+          <div className="mt-5 h-1 w-48 mx-auto bg-surface-800 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-purple-500 to-cyan-400 shimmer-bg rounded-full" style={{width:'100%'}}></div>
+          </div>
+        </div>
+      );
+    }
 
-              return (
-                <div key={i} className="mb-3">
-                  <div className="flex justify-between text-sm">
-                    <span className={color}>{label}</span>
-                    <span>{c.score?.toFixed(2)}</span>
+    function ErrorMessage({ message }) {
+      return (
+        <div className="glass rounded-2xl p-6 border-red-500/30 animate-scale-in" style={{borderColor:'rgba(255,82,82,0.3)'}}>
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center flex-shrink-0 text-xl">⚠️</div>
+            <div>
+              <h3 className="text-sm font-bold text-red-400 mb-1">Detection Failed</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">{message}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function VerdictCard({ result }) {
+      const isFaithful = result.verdict === 'FAITHFUL';
+      const pct = (result.confidence * 100).toFixed(1);
+
+      return (
+        <div className="glass rounded-2xl overflow-hidden animate-scale-in" id="verdict-card">
+          {/* Top accent bar */}
+          <div className="h-1" style={{background: isFaithful
+            ? 'linear-gradient(90deg, #00e676, #00f5d4)'
+            : 'linear-gradient(90deg, #ff5252, #ff6b9d)' }} />
+
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              {/* Verdict badge */}
+              <div className="relative flex-shrink-0">
+                <div
+                  className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl pulse-ring"
+                  style={{
+                    background: isFaithful ? 'rgba(0,230,118,0.1)' : 'rgba(255,82,82,0.1)',
+                    border: `2px solid ${isFaithful ? 'rgba(0,230,118,0.3)' : 'rgba(255,82,82,0.3)'}`,
+                    color: isFaithful ? '#00e676' : '#ff5252',
+                  }}
+                >
+                  {isFaithful ? '✓' : '✗'}
+                </div>
+              </div>
+
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                  <span
+                    className="text-2xl md:text-3xl font-black tracking-tight"
+                    style={{ color: isFaithful ? '#00e676' : '#ff5252' }}
+                  >
+                    {result.verdict}
+                  </span>
+                </div>
+
+                {/* Confidence */}
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Confidence</span>
+                  <span className="text-lg font-bold font-mono" style={{ color: isFaithful ? '#00f5d4' : '#ff6b9d' }}>
+                    {pct}%
+                  </span>
+                </div>
+                <div className="h-2 bg-surface-800 rounded-full overflow-hidden max-w-xs">
+                  <div
+                    className="h-full rounded-full confidence-bar"
+                    style={{
+                      width: `${pct}%`,
+                      background: isFaithful
+                        ? 'linear-gradient(90deg, #00e676, #00f5d4)'
+                        : 'linear-gradient(90deg, #ff5252, #ff6b9d)',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function SummaryCard({ summary }) {
+      return (
+        <div className="glass rounded-2xl p-6 animate-fade-up" id="summary-card">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Summary</h3>
+          </div>
+          <p className="text-slate-300 text-sm leading-relaxed pl-4 border-l-2 border-cyan-500/30">
+            {summary}
+          </p>
+        </div>
+      );
+    }
+
+    function ClaimCard({ claim, index }) {
+      const colors = labelColor(claim.final_label);
+      const simPct = (claim.similarity * 100).toFixed(1);
+
+      return (
+        <div
+          className="stagger-child glass rounded-xl p-4 transition-all duration-300 hover:border-purple-500/30"
+          style={{ borderColor: colors.border }}
+        >
+          <div className="flex items-start gap-3">
+            {/* Index */}
+            <div className="w-7 h-7 rounded-lg bg-surface-800 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-bold text-slate-500">{index + 1}</span>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              {/* Claim text */}
+              <p className="text-sm text-slate-300 leading-relaxed mb-3">{claim.text}</p>
+
+              {/* Labels row */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Final label badge */}
+                <span
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                  style={{ background: colors.bg, color: colors.text, border: `1px solid ${colors.border}` }}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: colors.dot }}></span>
+                  {claim.final_label}
+                </span>
+
+                {/* NLI label */}
+                <span className="px-2 py-1 rounded-lg text-xs font-medium bg-surface-800 text-slate-500 border border-surface-700/50">
+                  NLI: {claim.nli_label}
+                </span>
+
+                {/* Similarity */}
+                <span className="px-2 py-1 rounded-lg text-xs font-mono font-semibold bg-surface-800 text-purple-300 border border-purple-500/20">
+                  sim: {simPct}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ClaimsSection({ claims }) {
+      if (!claims || claims.length === 0) return null;
+
+      const entailed = claims.filter(c => c.final_label === 'ENTAILED').length;
+      const contradiction = claims.filter(c => c.final_label === 'CONTRADICTION').length;
+      const unsupported = claims.filter(c => c.final_label === 'UNSUPPORTED').length;
+
+      return (
+        <div className="glass rounded-2xl p-6 md:p-8 animate-fade-up" id="claims-section">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+                Claim Breakdown
+              </h3>
+              <span className="ml-1 px-2 py-0.5 rounded-md bg-surface-800 text-xs font-mono text-slate-500">
+                {claims.length}
+              </span>
+            </div>
+
+            {/* Mini stats */}
+            <div className="hidden sm:flex items-center gap-3 text-xs font-mono">
+              <span className="text-green-400">{entailed} ✓</span>
+              <span className="text-red-400">{contradiction} ✗</span>
+              <span className="text-yellow-400">{unsupported} ?</span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {claims.map((claim, i) => (
+              <ClaimCard key={i} claim={claim} index={i} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function Heatmap({ matrix, claims }) {
+      if (!matrix || matrix.length === 0) return null;
+
+      const numClaims = matrix.length;
+      const numSources = matrix[0] ? matrix[0].length : 0;
+      if (numSources === 0) return null;
+
+      // Claim labels
+      const claimLabels = claims
+        ? claims.map((c, i) => c.text.length > 30 ? c.text.slice(0, 30) + '…' : c.text)
+        : matrix.map((_, i) => `Claim ${i + 1}`);
+
+      const sourceLabels = matrix[0].map((_, j) => `Src ${j + 1}`);
+
+      // Cell size
+      const cellSize = 44;
+
+      return (
+        <div className="glass rounded-2xl p-6 md:p-8 animate-fade-up" id="heatmap-section">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-2 h-2 rounded-full bg-pink-400"></div>
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+              Alignment Heatmap
+            </h3>
+          </div>
+          <p className="text-xs text-slate-500 mb-5">
+            Cosine similarity between each extracted claim and source sentence. Hover for values.
+          </p>
+
+          {/* Color scale legend */}
+          <div className="flex items-center gap-2 mb-5 text-xs text-slate-500">
+            <span>0.0</span>
+            <div className="flex-1 max-w-[200px] h-3 rounded-full overflow-hidden" style={{
+              background: 'linear-gradient(90deg, hsl(0,70%,25%), hsl(55,75%,35%), hsl(110,80%,38%), hsl(165,85%,42%), hsl(220,90%,50%))'
+            }}></div>
+            <span>1.0</span>
+          </div>
+
+          <div className="overflow-x-auto pb-3">
+            <div className="inline-block">
+              {/* Header row */}
+              <div className="flex" style={{ paddingLeft: '140px' }}>
+                {sourceLabels.map((label, j) => (
+                  <div
+                    key={j}
+                    className="text-center text-[10px] font-mono text-slate-500 truncate"
+                    style={{ width: cellSize, minWidth: cellSize }}
+                  >
+                    {label}
                   </div>
-                  <p className="text-gray-300">{c.text}</p>
+                ))}
+              </div>
+
+              {/* Rows */}
+              {matrix.map((row, i) => (
+                <div key={i} className="flex items-center mt-0.5">
+                  {/* Row label */}
+                  <div
+                    className="text-[10px] font-mono text-slate-500 truncate pr-2 text-right flex-shrink-0"
+                    style={{ width: '140px' }}
+                    title={claims ? claims[i].text : `Claim ${i+1}`}
+                  >
+                    {claimLabels[i]}
+                  </div>
+
+                  {/* Cells */}
+                  {row.map((val, j) => {
+                    const displayVal = typeof val === 'number' ? val.toFixed(3) : '—';
+                    const bgColor = typeof val === 'number' ? similarityToHSL(val) : '#1e2a4a';
+                    return (
+                      <div
+                        key={j}
+                        className="heatmap-cell tooltip-container"
+                        style={{
+                          width: cellSize,
+                          height: cellSize,
+                          minWidth: cellSize,
+                          background: bgColor,
+                          margin: '1px',
+                          borderRadius: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <span className="text-[10px] font-mono font-semibold text-white/80 select-none">
+                          {typeof val === 'number' ? val.toFixed(2) : '—'}
+                        </span>
+                        <span className="tooltip-text">{displayVal}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
+        </div>
+      );
+    }
 
-          {/* 🔥 INTERACTIVE HEATMAP */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Alignment Heatmap</h3>
+    function MetricsBar({ result }) {
+      if (!result.metrics) return null;
+      const m = result.metrics;
 
-            {matrix.map((row,i)=>(
-              <div key={i} className="flex gap-1 mb-1">
+      const items = [
+        { label: 'Entailed', value: `${(m.entailed_fraction * 100).toFixed(1)}%`, color: '#00e676' },
+        { label: 'Unsupported', value: `${(m.unsupported_fraction * 100).toFixed(1)}%`, color: '#ffd740' },
+        { label: 'Contradictions', value: m.contradiction_count, color: '#ff5252' },
+        { label: 'Avg Similarity', value: `${(m.avg_similarity * 100).toFixed(1)}%`, color: '#7b61ff' },
+      ];
 
-                <div className="w-40 text-xs text-gray-400 truncate">
-                  {claims[i]?.text}
-                </div>
-
-                {row.map((val,j)=>{
-                  const v = val || 0;
-
-                  const bg = `hsl(${(1 - v) * 240}, 90%, ${30 + v * 40}%)`;
-
-                  return (
-                    <div
-                      key={j}
-                      className="w-12 h-10 flex items-center justify-center text-xs font-mono rounded hover:scale-110 transition"
-                      style={{backgroundColor:bg}}
-                      title={`Similarity: ${v.toFixed(2)}`}
-                    >
-                      {v.toFixed(2)}
-                    </div>
-                  );
-                })}
+      return (
+        <div className="glass rounded-2xl p-5 animate-fade-up" id="metrics-bar">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Metrics</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {items.map((item, i) => (
+              <div key={i} className="bg-surface-900/60 rounded-xl p-3 text-center border border-surface-700/40">
+                <p className="text-xs text-slate-500 mb-1">{item.label}</p>
+                <p className="text-xl font-bold font-mono" style={{ color: item.color }}>{item.value}</p>
               </div>
             ))}
           </div>
-
         </div>
-      )}
+      );
+    }
 
-    </div>
-  );
-}
+    function Footer() {
+      return (
+        <footer className="text-center py-8 text-xs text-slate-600">
+          <p>Hallucination Hunter · Powered by NLI + Sentence-Transformers</p>
+          <p className="mt-1">
+            <a href="/docs" className="text-purple-500 hover:text-purple-400 transition-colors">API Docs</a>
+            {' · '}
+            <a href="/redoc" className="text-purple-500 hover:text-purple-400 transition-colors">ReDoc</a>
+          </p>
+        </footer>
+      );
+    }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+    // ── Main App ─────────────────────────────────────────────────
+    function App() {
+      const [source, setSource] = useState('');
+      const [response, setResponse] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState(null);
+      const resultRef = useRef(null);
 
-</script>
+      const handleDetect = async () => {
+        if (!source.trim() || !response.trim()) return;
+
+        setLoading(true);
+        setResult(null);
+        setError(null);
+
+        try {
+          const res = await fetch(`${API_URL}/detect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: source.trim(), response: response.trim() }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => null);
+            throw new Error(errorData?.detail || `Server error (${res.status})`);
+          }
+
+          const data = await res.json();
+          setResult(data);
+
+          // Scroll to results
+          setTimeout(() => {
+            resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+
+        } catch (err) {
+          setError(err.message || 'Failed to connect to the API. Please check if the server is running.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto px-4 pb-8">
+          <Header />
+
+          <div className="space-y-6 mt-4">
+            <InputSection
+              source={source}
+              setSource={setSource}
+              response={response}
+              setResponse={setResponse}
+              onDetect={handleDetect}
+              loading={loading}
+            />
+
+            {/* Loading */}
+            {loading && <LoadingOverlay />}
+
+            {/* Error */}
+            {error && <ErrorMessage message={error} />}
+
+            {/* Results */}
+            {result && (
+              <div ref={resultRef} className="space-y-5">
+                <VerdictCard result={result} />
+                <SummaryCard summary={result.summary} />
+                <MetricsBar result={result} />
+                <ClaimsSection claims={result.claims} />
+                <Heatmap matrix={result.alignment_matrix} claims={result.claims} />
+              </div>
+            )}
+          </div>
+
+          <Footer />
+        </div>
+      );
+    }
+
+    // ── Mount ────────────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>

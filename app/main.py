@@ -7,10 +7,19 @@ from __future__ import annotations
 import sys
 import os
 
-# Ensure project root is on the path so `configs`, `app`, etc. are importable
+# ── Path Setup ──────────────────────────────────────────────────────
+# PROJECT_ROOT = parent of `app/` = the repo root (hallucination_hunter/)
+# We add it to sys.path so bare imports like `from configs.settings ...`,
+# `from core.pipeline ...`, `from models.schemas ...` resolve correctly.
+# This is also reinforced via PYTHONPATH in the start command / Dockerfile.
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+# Also add app/ itself so sibling packages resolve from within app/
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+if APP_DIR not in sys.path:
+    sys.path.insert(0, APP_DIR)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,17 +57,20 @@ INDEX_HTML = os.path.join(PROJECT_ROOT, "ui", "index.html")
 @app.get("/", include_in_schema=False)
 async def serve_ui():
     """Serve the Hallucination Hunter web interface."""
-    return FileResponse(INDEX_HTML, media_type="text/html")
+    if os.path.exists(INDEX_HTML):
+        return FileResponse(INDEX_HTML, media_type="text/html")
+    return {"message": "Hallucination Hunter API is running. Visit /docs for API documentation."}
 
 
 @app.on_event("startup")
 async def startup_event():
     """Warm up models on startup for faster first request."""
+    port = os.environ.get("PORT", "8001")
     print("[Hallucination Hunter] Models will be lazy-loaded on first request.")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
-    print("[Hallucination Hunter] 🌐 Web UI  → http://localhost:8001")
-    print("[Hallucination Hunter] 📡 API     → http://localhost:8001/detect")
-    print("[Hallucination Hunter] 📚 Docs    → http://localhost:8001/docs")
+    print(f"[Hallucination Hunter] 🌐 Web UI  → http://localhost:{port}")
+    print(f"[Hallucination Hunter] 📡 API     → http://localhost:{port}/detect")
+    print(f"[Hallucination Hunter] 📚 Docs    → http://localhost:{port}/docs")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
 
 

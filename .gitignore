@@ -23,7 +23,7 @@ build/
 
 # Data
 data/
-models/
+/models/
 
 # OS
 .DS_Store

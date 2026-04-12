@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /hallucination_hunter
+WORKDIR /opt/render/project/src
 
 # System deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 COPY . .
 
 # Set PYTHONPATH so app-prefixed imports resolve from project root
-ENV PYTHONPATH="/hallucination_hunter"
+ENV PYTHONPATH="/opt/render/project/src"
 
 # Expose port (Render overrides this via PORT env var)
 EXPOSE 10000

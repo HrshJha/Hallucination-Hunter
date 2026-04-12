@@ -15,13 +15,21 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from app.configs.settings import settings
 
-# ── Label map ────────────────────────────────────────────────────────
+# ── Label map (built lazily to avoid import-time side-effects) ───────
 
-LABEL_MAP: Dict[int, str] = {
-    settings.threshold.contradiction_idx: "contradiction",
-    settings.threshold.entailment_idx: "entailment",
-    settings.threshold.neutral_idx: "neutral",
-}
+_LABEL_MAP: Dict[int, str] | None = None
+
+
+def _get_label_map() -> Dict[int, str]:
+    global _LABEL_MAP
+    if _LABEL_MAP is None:
+        _LABEL_MAP = {
+            settings.threshold.contradiction_idx: "contradiction",
+            settings.threshold.entailment_idx: "entailment",
+            settings.threshold.neutral_idx: "neutral",
+        }
+    return _LABEL_MAP
+
 
 # ── Lazy-loaded model + tokenizer ────────────────────────────────────
 
@@ -60,6 +68,7 @@ def classify_pairs(
         Each dict: ``{"label": str, "scores": {str: float}}``.
     """
     _load()
+    label_map = _get_label_map()
 
     if batch_size is None:
         batch_size = settings.inference.nli_batch_size
@@ -87,7 +96,7 @@ def classify_pairs(
         for prob_row in probs:
             label_idx = int(np.argmax(prob_row))
             results.append({
-                "label": LABEL_MAP[label_idx],
+                "label": label_map[label_idx],
                 "scores": {
                     "contradiction": float(prob_row[settings.threshold.contradiction_idx]),
                     "entailment": float(prob_row[settings.threshold.entailment_idx]),

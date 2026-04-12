@@ -1,11 +1,13 @@
 """
 Global configuration for Hallucination Hunter.
 All thresholds, model names, and runtime settings live here.
+
+NOTE: torch is lazy-imported so the app can start and bind its port
+      even if PyTorch is slow to initialise or absent.
 """
 
 from dataclasses import dataclass, field
 from typing import Optional
-import torch
 
 
 @dataclass
@@ -40,7 +42,19 @@ class InferenceConfig:
     nli_batch_size: int = 32
     similarity_batch_size: int = 64
     max_claims: int = 50
-    device: str = field(default_factory=lambda: "cuda" if torch.cuda.is_available() else "cpu")
+    device: str = ""  # resolved lazily
+
+    def __post_init__(self):
+        if not self.device:
+            self.device = self._detect_device()
+
+    @staticmethod
+    def _detect_device() -> str:
+        try:
+            import torch
+            return "cuda" if torch.cuda.is_available() else "cpu"
+        except Exception:
+            return "cpu"
 
 
 @dataclass

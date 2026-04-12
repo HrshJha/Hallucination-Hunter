@@ -49,15 +49,14 @@ async def serve_ui():
 
 @app.on_event("startup")
 async def startup_event():
-    """Warm up models on startup for faster first request."""
-    port = os.environ.get("PORT", "8001")
+    """Log startup info. Models are lazy-loaded on first request."""
+    port = os.environ.get("PORT", "10000")
     print("[Hallucination Hunter] Models will be lazy-loaded on first request.")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
-    print(f"[Hallucination Hunter] 🌐 Web UI  → http://localhost:{port}")
-    print(f"[Hallucination Hunter] 📡 API     → http://localhost:{port}/detect")
-    print(f"[Hallucination Hunter] 📚 Docs    → http://localhost:{port}/docs")
+    print(f"[Hallucination Hunter] 🌐 Web UI  → http://0.0.0.0:{port}")
+    print(f"[Hallucination Hunter] 📡 API     → http://0.0.0.0:{port}/detect")
+    print(f"[Hallucination Hunter] 📚 Docs    → http://0.0.0.0:{port}/docs")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
-
 
 
 if __name__ == "__main__":

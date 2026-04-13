@@ -288,20 +288,53 @@ Swagger UI is auto-generated — test every endpoint directly in the browser, no
 
 <div align="center">
 
-| Swagger UI | Heatmap Output | Claim Breakdown |
-|:---:|:---:|:---:|
-| ![Swagger UI](https://placehold.co/280x180/1a1a2e/ffffff?text=Swagger+UI) | ![Heatmap](https://placehold.co/280x180/302b63/ffffff?text=Alignment+Heatmap) | ![Claims](https://placehold.co/280x180/24243e/ffffff?text=Claim+Breakdown) |
-| *Interactive API docs at `/docs`* | *Claim-to-source alignment matrix* | *Per-claim NLI verdict* |
-
-> 💡 **Live Demo** — Run locally and hit `/docs` for a fully interactive experience.
+|                                  Swagger UI                                  |                                          Heatmap Output                                         |                                         Claim Breakdown                                        |
+| :--------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
+| <img src="https://hallucination-hunter-io2j.onrender.com/docs" width="280"/> | <img src="https://via.placeholder.com/280x180/302b63/ffffff?text=Heatmap+Preview" width="280"/> | <img src="https://via.placeholder.com/280x180/24243e/ffffff?text=Claims+Preview" width="280"/> |
+|                            *Interactive API docs*                            |                                   *Semantic alignment matrix*                                   |                                    *Per-claim NLI analysis*                                    |
 
 </div>
 
-<br/>
+---
 
-<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%">
+### 🚀 Live Demo
 
-<br/>
+* 🌐 App: https://hallucination-hunter-io2j.onrender.com
+* 📡 API Docs: https://hallucination-hunter-io2j.onrender.com/docs
+
+---
+
+### ⚡ Example Request
+
+```bash
+curl -X POST https://hallucination-hunter-io2j.onrender.com/detect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": "The Sun rises in the east.",
+    "response": "The Sun rises in the east."
+  }'
+```
+
+---
+
+### 📊 Example Response
+
+```json
+{
+  "verdict": "FAITHFUL",
+  "confidence": 0.97,
+  "summary": "All claims are supported by the source.",
+  "claims": [],
+  "alignment_matrix": [],
+  "metrics": {
+    "entailed_fraction": 1.0,
+    "unsupported_fraction": 0.0,
+    "contradiction_count": 0,
+    "avg_similarity": 1.0
+  }
+}
+```
+
 
 ## 🧪 Usage
 

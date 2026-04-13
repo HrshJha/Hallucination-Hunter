@@ -5,7 +5,7 @@ API Routes – hallucination detection endpoint.
 from __future__ import annotations
 
 import base64
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.models.schemas import DetectionRequest, DetectionResponse
 from app.core.pipeline import detect
@@ -33,8 +33,6 @@ def _check_warmup():
     tags=["Detection"],
 )
 async def detect_hallucination(req: DetectionRequest) -> DetectionResponse:
-<<<<<<< HEAD
-=======
     """
     **Input:**
     - `source`: original reference passage
@@ -47,24 +45,25 @@ async def detect_hallucination(req: DetectionRequest) -> DetectionResponse:
     - `alignment_matrix`: cosine similarity (claims × source sentences)
     """
     _check_warmup()
->>>>>>> d54e009 (new commit)
     try:
-        # 🔒 Input validation
+        # Input validation
         if not req.source or not req.response:
             raise ValueError("Source or response cannot be empty")
 
         result = detect(req.source, req.response)
 
-        # 🔒 Safety check
+        # Safety check
         if result is None:
             raise ValueError("Detection returned None")
 
         return result
 
+    except HTTPException:
+        raise  # re-raise 503 from _check_warmup
     except Exception as e:
         print("🔥 ERROR IN /detect:", str(e))
 
-        # 🚑 NEVER crash → always return structured response
+        # Never crash → always return structured response
         return DetectionResponse(
             verdict="ERROR",
             confidence=0.0,
@@ -86,11 +85,8 @@ async def detect_hallucination(req: DetectionRequest) -> DetectionResponse:
     tags=["Detection"],
 )
 async def detect_and_visualize(req: DetectionRequest):
-<<<<<<< HEAD
-=======
     """Same as /detect but also returns a base64-encoded heatmap image."""
     _check_warmup()
->>>>>>> d54e009 (new commit)
     try:
         if not req.source or not req.response:
             raise ValueError("Source or response cannot be empty")
@@ -111,6 +107,8 @@ async def detect_and_visualize(req: DetectionRequest):
             "heatmap_png_base64": base64.b64encode(img_bytes).decode() if img_bytes else None,
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print("🔥 ERROR IN /detect/visualize:", str(e))
 

@@ -1,29 +1,20 @@
-fastapi
-uvicorn[standard]
-pydantic
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+pydantic==2.6.4
 
-# ML / NLI
-# NOTE: torch is NOT listed here on purpose.
-# It is installed separately via the Render build command / Dockerfile
-# with --index-url https://download.pytorch.org/whl/cpu to get the
-# CPU-only build (~200 MB).  If torch appears here, pip re-resolves it
-# from PyPI and installs the CUDA build (~2 GB + nvidia packages),
-# which OOMs on Render's 512 MB free tier.
-transformers
-sentence-transformers
+# ML / NLI (unchanged core)
+transformers==4.40.0
+sentence-transformers==2.6.1
 
-# NLP
-spacy
+# NLP (lightweight model only)
+spacy==3.7.4
 
 # Numerical
-numpy
-scikit-learn
+numpy==1.26.4
+scikit-learn==1.4.2
 
-# Visualization (used by app/utils/visualization.py)
-matplotlib
-seaborn
+# Visualization (light replacement)
+pillow==10.3.0
 
-# Utilities
-requests
-python-dotenv
-tqdm
+# Utilities (only if used in code)
+requests==2.31.0

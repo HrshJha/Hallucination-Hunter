@@ -5,11 +5,16 @@ def plot_alignment_matrix(
     title="Semantic Alignment Heatmap",
     save_path=None,
 ):
-    import matplotlib
-    matplotlib.use("Agg")
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+    except ImportError:
+        import logging
+        logging.warning("Visualization libraries (matplotlib/seaborn) are not installed. Skipping plot.")
+        return None
 
-    import matplotlib.pyplot as plt
-    import seaborn as sns
     import numpy as np
     import io
 

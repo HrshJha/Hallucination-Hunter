@@ -4,11 +4,14 @@ Hallucination Hunter – FastAPI Application
 
 from __future__ import annotations
 
+import asyncio
 import os
+import threading
+import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.api.routes import router
 
@@ -35,6 +38,51 @@ app.add_middleware(
 
 app.include_router(router)
 
+# ── Model warmup state ─────────────────────────────────────────────
+_warmup_state = {"ready": False, "error": None, "started_at": None}
+
+
+def _warmup_models():
+    """Pre-load ML models in a background thread so first /detect isn't slow."""
+    global _warmup_state
+    _warmup_state["started_at"] = time.time()
+    try:
+        print("[Warmup] Loading NLI model...")
+        from app.core.nli import _load as load_nli
+        load_nli()
+        print("[Warmup] NLI model loaded.")
+
+        print("[Warmup] Loading similarity model...")
+        from app.core.similarity import _get_model as load_sim
+        load_sim()
+        print("[Warmup] Similarity model loaded.")
+
+        print("[Warmup] Loading spaCy model...")
+        from app.claims.extractor import _get_nlp
+        _get_nlp()
+        print("[Warmup] spaCy model loaded.")
+
+        _warmup_state["ready"] = True
+        elapsed = time.time() - _warmup_state["started_at"]
+        print(f"[Warmup] ✅ All models ready in {elapsed:.1f}s")
+    except Exception as e:
+        _warmup_state["error"] = str(e)
+        print(f"[Warmup] ❌ Failed: {e}")
+
+
+@app.get("/warmup-status", tags=["System"])
+async def warmup_status():
+    """Check if ML models are loaded and ready."""
+    elapsed = None
+    if _warmup_state["started_at"]:
+        elapsed = round(time.time() - _warmup_state["started_at"], 1)
+    return JSONResponse({
+        "ready": _warmup_state["ready"],
+        "error": _warmup_state["error"],
+        "elapsed_seconds": elapsed,
+    })
+
+
 # Serve the Web UI at root
 INDEX_HTML = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ui", "index.html")
 
@@ -49,14 +97,16 @@ async def serve_ui():
 
 @app.on_event("startup")
 async def startup_event():
-    """Log startup info. Models are lazy-loaded on first request."""
+    """Start background model warmup so /detect doesn't timeout on first call."""
     port = os.environ.get("PORT", "10000")
-    print("[Hallucination Hunter] Models will be lazy-loaded on first request.")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
     print(f"[Hallucination Hunter] 🌐 Web UI  → http://0.0.0.0:{port}")
     print(f"[Hallucination Hunter] 📡 API     → http://0.0.0.0:{port}/detect")
     print(f"[Hallucination Hunter] 📚 Docs    → http://0.0.0.0:{port}/docs")
     print("[Hallucination Hunter] ────────────────────────────────────────────")
+    print("[Hallucination Hunter] Starting background model warmup...")
+    thread = threading.Thread(target=_warmup_models, daemon=True)
+    thread.start()
 
 
 if __name__ == "__main__":

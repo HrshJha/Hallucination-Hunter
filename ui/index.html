@@ -702,6 +702,41 @@
       );
     }
 
+    // ── Warmup Banner ────────────────────────────────────────────
+    function WarmupBanner({ warmupState }) {
+      if (warmupState.ready) return null;
+
+      const dots = warmupState.elapsed ? '.'.repeat(Math.floor(warmupState.elapsed / 2) % 4) : '';
+
+      return (
+        <div className="glass rounded-2xl p-5 border border-yellow-500/20 animate-scale-in" id="warmup-banner">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-yellow-500/15 flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full border-2 border-yellow-400/40 border-t-yellow-400 animate-spin"></div>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-yellow-300 mb-0.5">Models Loading{dots}</h3>
+              <p className="text-xs text-slate-400">
+                {warmupState.error
+                  ? <span className="text-red-400">Error: {warmupState.error}</span>
+                  : warmupState.elapsed
+                    ? `ML models are warming up (${Math.round(warmupState.elapsed)}s). Detection will be available shortly.`
+                    : 'Connecting to backend and loading ML models...'
+                }
+              </p>
+            </div>
+            {warmupState.elapsed && !warmupState.error && (
+              <div className="hidden sm:block text-right">
+                <span className="text-xs font-mono text-yellow-400/60">{Math.round(warmupState.elapsed)}s</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     // ── Main App ─────────────────────────────────────────────────
     function App() {
       const [source, setSource] = useState('');
@@ -709,7 +744,39 @@
       const [loading, setLoading] = useState(false);
       const [result, setResult] = useState(null);
       const [error, setError] = useState(null);
+      const [warmup, setWarmup] = useState({ ready: false, error: null, elapsed: null });
       const resultRef = useRef(null);
+
+      // ── Poll warmup status ──
+      useEffect(() => {
+        let cancelled = false;
+        let interval;
+
+        const checkWarmup = async () => {
+          try {
+            const res = await fetch(`${API_URL}/warmup-status`);
+            if (res.ok) {
+              const data = await res.json();
+              if (!cancelled) {
+                setWarmup(data);
+                if (data.ready) {
+                  clearInterval(interval);
+                }
+              }
+            }
+          } catch (e) {
+            // Backend not reachable yet, keep polling
+          }
+        };
+
+        checkWarmup();
+        interval = setInterval(checkWarmup, 3000);
+
+        return () => {
+          cancelled = true;
+          clearInterval(interval);
+        };
+      }, []);
 
       const handleDetect = async () => {
         if (!source.trim() || !response.trim()) return;
@@ -719,15 +786,33 @@
         setError(null);
 
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
           const res = await fetch(`${API_URL}/detect`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ source: source.trim(), response: response.trim() }),
+            signal: controller.signal,
           });
 
+          clearTimeout(timeoutId);
+
           if (!res.ok) {
-            const errorData = await res.json().catch(() => null);
-            throw new Error(errorData?.detail || `Server error (${res.status})`);
+            const text = await res.text();
+            let detail;
+            try {
+              detail = JSON.parse(text)?.detail;
+            } catch (_) {
+              detail = null;
+            }
+
+            if (res.status === 502) {
+              throw new Error(
+                'Backend timed out (502). Models may still be loading — please wait ~30s and retry.'
+              );
+            }
+            throw new Error(detail || `Server error (${res.status})`);
           }
 
           const data = await res.json();
@@ -739,7 +824,11 @@
           }, 100);
 
         } catch (err) {
-          setError(err.message || 'Failed to connect to the API. Please check if the server is running.');
+          if (err.name === 'AbortError') {
+            setError('Request timed out. The server may be under heavy load — please try again.');
+          } else {
+            setError(err.message || 'Failed to connect to the API. Please check if the server is running.');
+          }
         } finally {
           setLoading(false);
         }
@@ -750,13 +839,16 @@
           <Header />
 
           <div className="space-y-6 mt-4">
+            {/* Warmup status banner */}
+            <WarmupBanner warmupState={warmup} />
+
             <InputSection
               source={source}
               setSource={setSource}
               response={response}
               setResponse={setResponse}
               onDetect={handleDetect}
-              loading={loading}
+              loading={loading || !warmup.ready}
             />
 
             {/* Loading */}

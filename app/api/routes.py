@@ -15,6 +15,17 @@ from app.utils.visualization import plot_alignment_matrix
 router = APIRouter()
 
 
+def _check_warmup():
+    """Raise 503 if ML models haven't finished loading yet."""
+    # Import here to avoid circular imports
+    from app.main import _warmup_state
+    if not _warmup_state["ready"]:
+        raise HTTPException(
+            status_code=503,
+            detail="ML models are still loading. Please wait and retry in a few seconds.",
+        )
+
+
 @router.post(
     "/detect",
     response_model=DetectionResponse,
@@ -22,6 +33,21 @@ router = APIRouter()
     tags=["Detection"],
 )
 async def detect_hallucination(req: DetectionRequest) -> DetectionResponse:
+<<<<<<< HEAD
+=======
+    """
+    **Input:**
+    - `source`: original reference passage
+    - `response`: AI-generated answer
+
+    **Output:**
+    - `label`: FAITHFUL or HALLUCINATED
+    - `confidence`: 0–1 float
+    - `claims`: per-claim NLI breakdown
+    - `alignment_matrix`: cosine similarity (claims × source sentences)
+    """
+    _check_warmup()
+>>>>>>> d54e009 (new commit)
     try:
         # 🔒 Input validation
         if not req.source or not req.response:
@@ -60,6 +86,11 @@ async def detect_hallucination(req: DetectionRequest) -> DetectionResponse:
     tags=["Detection"],
 )
 async def detect_and_visualize(req: DetectionRequest):
+<<<<<<< HEAD
+=======
+    """Same as /detect but also returns a base64-encoded heatmap image."""
+    _check_warmup()
+>>>>>>> d54e009 (new commit)
     try:
         if not req.source or not req.response:
             raise ValueError("Source or response cannot be empty")

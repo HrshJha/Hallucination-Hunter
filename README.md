@@ -288,10 +288,10 @@ Swagger UI is auto-generated — test every endpoint directly in the browser, no
 
 <div align="center">
 
-|                                  Swagger UI                                  |                                          Heatmap Output                                         |                                         Claim Breakdown                                        |
-| :--------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
-| <img src="https://hallucination-hunter-io2j.onrender.com/docs" width="280"/> | <img src="https://via.placeholder.com/280x180/302b63/ffffff?text=Heatmap+Preview" width="280"/> | <img src="https://via.placeholder.com/280x180/24243e/ffffff?text=Claims+Preview" width="280"/> |
-|                            *Interactive API docs*                            |                                   *Semantic alignment matrix*                                   |                                    *Per-claim NLI analysis*                                    |
+| Swagger UI | Heatmap Output | Claim Breakdown |
+|:---:|:---:|:---:|
+| <a href="https://hallucination-hunter-io2j.onrender.com/docs"><img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/swagger.png" width="280"/></a> | <img src="https://via.placeholder.com/280x180/302b63/ffffff?text=Heatmap+Preview" width="280"/> | <img src="https://via.placeholder.com/280x180/24243e/ffffff?text=Claims+Preview" width="280"/> |
+| *Interactive API docs* | *Semantic alignment matrix* | *Per-claim NLI analysis* |
 
 </div>
 

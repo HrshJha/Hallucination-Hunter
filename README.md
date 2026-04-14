@@ -284,23 +284,63 @@ Swagger UI is auto-generated — test every endpoint directly in the browser, no
 
 <br/>
 
-## 📸 Screenshots & Demo
+
+
+## 📸 Screenshots & Live Demo
 
 <div align="center">
 
-| Swagger UI | Heatmap Output | Claim Breakdown |
-|:---:|:---:|:---:|
-| <a href="https://hallucination-hunter-io2j.onrender.com/docs"><img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/swagger.png" width="280"/></a> | <img src="https://via.placeholder.com/280x180/302b63/ffffff?text=Heatmap+Preview" width="280"/> | <img src="https://via.placeholder.com/280x180/24243e/ffffff?text=Claims+Preview" width="280"/> |
-| *Interactive API docs* | *Semantic alignment matrix* | *Per-claim NLI analysis* |
+<table>
+<tr>
+<td align="center" width="33%">
+
+<a href="https://hallucination-hunter-io2j.onrender.com/docs" target="_blank">
+  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/swagger.png" width="100%" />
+</a>
+
+<br/>
+
+<b>Swagger UI</b><br/>
+<sub>Interactive API Docs (Click to open)</sub>
+
+</td>
+
+<td align="center" width="33%">
+
+<a href="https://hallucination-hunter-io2j.onrender.com/" target="_blank">
+  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/heatmap.png" width="100%" />
+</a>
+
+<br/>
+
+<b>Heatmap Output</b><br/>
+<sub>Semantic alignment matrix</sub>
+
+</td>
+
+<td align="center" width="33%">
+
+<a href="https://hallucination-hunter-io2j.onrender.com/" target="_blank">
+  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/claims.png" width="100%" />
+</a>
+
+<br/>
+
+<b>Claim Breakdown</b><br/>
+<sub>Per-claim NLI analysis</sub>
+
+</td>
+</tr>
+</table>
 
 </div>
 
 ---
 
-### 🚀 Live Demo
+### 🚀 Try it live
+- 👉 **API Docs (Swagger):** https://hallucination-hunter-io2j.onrender.com/docs  
+- 👉 **Live System:** https://hallucination-hunter-io2j.onrender.com/
 
-* 🌐 App: https://hallucination-hunter-io2j.onrender.com
-* 📡 API Docs: https://hallucination-hunter-io2j.onrender.com/docs
 
 ---
 

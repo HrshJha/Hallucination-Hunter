@@ -286,63 +286,33 @@ Swagger UI is auto-generated — test every endpoint directly in the browser, no
 
 
 
-## 📸 Screenshots & Live Demo
+## 📸 Demo & API
 
-<div align="center">
+### 🚀 Live System
+👉 https://hallucination-hunter-io2j.onrender.com/
 
-<table>
-<tr>
-<td align="center" width="33%">
+### 📘 API Documentation (Swagger)
+👉 https://hallucination-hunter-io2j.onrender.com/docs
 
-<a href="https://hallucination-hunter-io2j.onrender.com/docs" target="_blank">
-  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/swagger.png" width="100%" />
-</a>
-
-<br/>
-
-<b>Swagger UI</b><br/>
-<sub>Interactive API Docs (Click to open)</sub>
-
-</td>
-
-<td align="center" width="33%">
-
-<a href="https://hallucination-hunter-io2j.onrender.com/" target="_blank">
-  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/heatmap.png" width="100%" />
-</a>
-
-<br/>
-
-<b>Heatmap Output</b><br/>
-<sub>Semantic alignment matrix</sub>
-
-</td>
-
-<td align="center" width="33%">
-
-<a href="https://hallucination-hunter-io2j.onrender.com/" target="_blank">
-  <img src="https://raw.githubusercontent.com/HrshJha/Hallucination-Hunter/main/assets/claims.png" width="100%" />
-</a>
-
-<br/>
-
-<b>Claim Breakdown</b><br/>
-<sub>Per-claim NLI analysis</sub>
-
-</td>
-</tr>
-</table>
-
-</div>
+> ⚠️ First request may take ~30–60s due to Render free tier cold start
 
 ---
 
-### 🚀 Try it live
-- 👉 **API Docs (Swagger):** https://hallucination-hunter-io2j.onrender.com/docs  
-- 👉 **Live System:** https://hallucination-hunter-io2j.onrender.com/
-
+### 🧠 What you can try
+- Paste any LLM response → get hallucination heatmap
+- Inspect claim-level entailment / contradiction
+- Analyze semantic alignment across outputs
 
 ---
+
+### ⚙️ Example Flow
+1. Send input text via API / UI  
+2. System decomposes into atomic claims  
+3. Runs NLI + semantic similarity  
+4. Outputs:
+   - Alignment heatmap  
+   - Claim-level verdicts  
+   - Confidence signals
 
 ### ⚡ Example Request
 

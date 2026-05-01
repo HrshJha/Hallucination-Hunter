@@ -1,7 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:24243e&height=220&section=header&text=🔍%20Hallucination%20Hunter&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=AI%20doesn't%20always%20tell%20the%20truth.%20Now%20you%20can%20prove%20it.&descAlignY=58&descSize=16&descColor=ccccff" width="100%"/>
-
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f0c29,50:302b63,100:24243e&height=220&section=header&text=CARA%20Classifier&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Career%20Alignment%20%26%20Recommendation%20Algorithm%20for%20Healthcare%20Graduates&descAlignY=58&descSize=16&descColor=ccccff" width="100%"/>
 <br/>
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
